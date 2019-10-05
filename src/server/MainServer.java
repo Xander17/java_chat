@@ -80,7 +80,7 @@ class MainServer {
     void broadcastMsg(String s) {
         if (clients.size() > 0) {
             SimpleDateFormat dateformat = new SimpleDateFormat("[HH:mm:ss] ");
-            clients.forEach(client -> client.sendMsg(dateformat.format(new Date()) + " " + s));
+            clients.forEach(client -> client.sendMsg(dateformat.format(new Date())  + s));
         }
     }
 

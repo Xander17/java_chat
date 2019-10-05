@@ -28,6 +28,7 @@ class ClientHandler {
                 while (true) {
                     String inputStr = inputStream.readUTF();
                     if (inputStr.equalsIgnoreCase(END_MESSAGE)) break;
+                    System.out.println(inputStr);
                     mainServer.broadcastMsg(inputStr);
                 }
             } catch (IOException ignored) {
@@ -61,8 +62,7 @@ class ClientHandler {
         if (!s.isEmpty() & !socket.isClosed()) {
             try {
                 outputStream.writeUTF(s);
-            } catch (IOException e) {
-                e.printStackTrace();
+            } catch (IOException ignored) {
             }
         }
     }
