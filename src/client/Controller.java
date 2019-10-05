@@ -24,7 +24,7 @@ public class Controller implements Initializable {
     @FXML
     Label titleLabel;
     @FXML
-    BorderPane titleBox;
+    BorderPane titleBox, mainPane;
     @FXML
     ToggleGroup skinsGroup;
     @FXML
@@ -37,8 +37,6 @@ public class Controller implements Initializable {
     Button btnSend;
     @FXML
     MenuItem mClear, mAbout, mNick;
-    @FXML
-    BorderPane mainPane;
 
     private String nickname;
     private boolean isMaximized = false;
@@ -210,7 +208,6 @@ public class Controller implements Initializable {
 
     private void setTitleStatus() {
         titleLabel.setText("GB Chat [Nickname: " + nickname + "]" + (socket.isClosed() ? " [No connection]" : ""));
-//        System.out.println("GB Chat [Nickname: " + nickname + "]" + (socket.isClosed() ? " [No connection]" : ""));
     }
 }
 
