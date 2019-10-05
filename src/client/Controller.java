@@ -12,9 +12,7 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
 
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.io.IOException;
+import java.io.*;
 import java.net.Socket;
 import java.net.URL;
 import java.util.ResourceBundle;
@@ -52,6 +50,11 @@ public class Controller implements Initializable {
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
+        runServerListener();
+        runConsoleHandler();
+    }
+
+    private void runServerListener() {
         try {
             socket = new Socket(IP_ADDRESS, PORT);
             inputStream = new DataInputStream(socket.getInputStream());
@@ -75,6 +78,26 @@ public class Controller implements Initializable {
         }
     }
 
+    private void runConsoleHandler() {
+        Thread consoleThread = new Thread(() -> {
+            BufferedReader consoleIn = new BufferedReader(new InputStreamReader(System.in));
+            String consoleString;
+            try {
+                while (true) {
+                    consoleString = consoleIn.readLine();
+                    if (consoleString.trim().isEmpty()) continue;
+                    sendMsg("Console: " + consoleString);
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            } finally {
+                closeIOStreams();
+            }
+        });
+        consoleThread.setDaemon(true);
+        consoleThread.start();
+    }
+
     private void closeIOStreams() {
         try {
             if (inputStream != null) inputStream.close();
@@ -95,7 +118,11 @@ public class Controller implements Initializable {
     }
 
     public void sendMsg() {
-        String s = tfMessage.getText().trim();
+        sendMsg(tfMessage.getText());
+    }
+
+    private void sendMsg(String s) {
+        s = s.trim();
         if (!s.isEmpty() & !socket.isClosed()) {
             try {
                 outputStream.writeUTF(s);
@@ -207,7 +234,8 @@ public class Controller implements Initializable {
     }
 
     private void setTitleStatus() {
-        titleLabel.setText("GB Chat [Nickname: " + nickname + "]" + (socket.isClosed() ? " [No connection]" : ""));
+        titleLabel.setText("GB Chat [Nickname: " + nickname + "]" +
+                (socket.isClosed() ? " [No connection]" : "[Connected to " + IP_ADDRESS + ":" + PORT + "]"));
     }
 }
 
