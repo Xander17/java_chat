@@ -27,7 +27,7 @@ class ClientHandler {
                 outputStream = new DataOutputStream(socket.getOutputStream());
                 while (true) {
                     String inputStr = inputStream.readUTF();
-                    if (inputStr.equals(END_MESSAGE)) break;
+                    if (inputStr.equalsIgnoreCase(END_MESSAGE)) break;
                     mainServer.broadcastMsg(inputStr);
                 }
             } catch (IOException ignored) {

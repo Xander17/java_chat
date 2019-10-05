@@ -47,7 +47,7 @@ class MainServer {
             try {
                 while (true) {
                     consoleString = consoleIn.readLine();
-                    if (consoleString.equals(END_MESSAGE)) break;
+                    if (consoleString.equalsIgnoreCase(END_MESSAGE)) break;
                     else broadcastMsg("Server: " + consoleString);
                 }
             } catch (IOException e) {

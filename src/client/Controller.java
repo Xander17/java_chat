@@ -114,8 +114,8 @@ public class Controller implements Initializable {
 
     public void exitChat() {
         closeIOStreams();
-        Stage stage = (Stage) mainPane.getScene().getWindow();
-        stage.close();
+        Platform.exit();
+        System.exit(0);
     }
 
     public void setNickname() {
