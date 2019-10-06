@@ -15,31 +15,31 @@
 <?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
 
+<?import javafx.scene.control.PasswordField?>
 <BorderPane fx:id="mainPane" xmlns="http://javafx.com/javafx/8.0.999-ea" xmlns:fx="http://javafx.com/fxml/1"
             fx:controller="client.Controller">
-
     <top>
         <VBox>
-            <BorderPane fx:id="titleBox" onMousePressed="#titlePressed" onMouseDragged="#titleDragged">
+            <!--<BorderPane fx:id="titleBox" onMousePressed="#titlePressed" onMouseDragged="#titleDragged">
                 <left>
                     <Label fx:id="titleLabel" text="GB Chat"/>
                 </left>
                 <right>
                     <HBox alignment="CENTER_RIGHT" prefHeight="25.0">
-                        <Button fx:id="btnMinimize" onAction="#minimize" prefHeight="25.0" prefWidth="30.0"
+                        <Button onAction="#minimize" prefHeight="25.0" prefWidth="30.0"
                                 styleClass="btnControl" text="_"/>
-                        <Button fx:id="btnFullScreen" onAction="#maximize" prefHeight="25.0" prefWidth="30.0"
+                        <Button onAction="#maximize" prefHeight="25.0" prefWidth="30.0"
                                 styleClass="btnControl" text="▬"/>
-                        <Button fx:id="bntClose" onAction="#exitChat" prefHeight="25.0" prefWidth="30.0"
+                        <Button onAction="#exitChat" prefHeight="25.0" prefWidth="30.0"
                                 styleClass="btnControl" text="X"/>
                     </HBox>
                 </right>
-            </BorderPane>
-
+            </BorderPane>-->
+<fx:include source="fxml/titleBar.fxml"/>
             <MenuBar fx:id="menuTop">
                 <Menu text="Chat">
-                    <MenuItem fx:id="mClear" disable="true" onAction="#clearChat" text="_Clear window"/>
-                    <MenuItem fx:id="mNick" disable="true" onAction="#changeNick" text="Change nickname"/>
+                    <MenuItem fx:id="mSignOut" disable="true" onAction="#disconnect" text="Sign Out"/>
+                    <MenuItem fx:id="mClear" disable="true" onAction="#clearChat" text="Clear window"/>
                     <SeparatorMenuItem/>
                     <MenuItem onAction="#exitChat" text="Close"/>
                 </Menu>
@@ -62,12 +62,27 @@
     <center>
         <StackPane>
             <TextArea fx:id="taChat" disable="true" editable="false"/>
-            <VBox fx:id="vboxNickname" alignment="CENTER" maxHeight="70.0" maxWidth="250.0">
-                <Label fx:id="lblNickname" text="Enter your nickname"/>
-                <TextField fx:id="tfNickname" maxWidth="200" onAction="#setNickname"/>
-                <Button fx:id="btnOk" maxWidth="150" onAction="#setNickname" styleClass="btnNotControl" text="OK"/>
+            <VBox fx:id="vboxLogin" alignment="CENTER" maxHeight="70.0" maxWidth="250.0" styleClass="dialogWindow">
+                <Label styleClass="lblDialogWindowTitle" text="Sign in" maxWidth="200.0"/>
+                <Label styleClass="lblLoginWindow" text="Login"/>
+                <TextField fx:id="tfLogin" maxWidth="200" onAction="#passwordFocus"/>
+                <Label styleClass="lblLoginWindow" text="Password"/>
+                <PasswordField fx:id="tfPassword" maxWidth="200" onAction="#loginToServer"/>
+                <Button maxWidth="150" onAction="#loginToServer" styleClass="btnNotControl" text="Sign in"/>
+                <Button maxWidth="150" onAction="#swapLoginReg" styleClass="btnNotControl" text="To Sign up"/>
             </VBox>
-            <VBox fx:id="vboxAbout" alignment="CENTER" maxHeight="70.0" maxWidth="150.0" visible="false">
+            <VBox fx:id="vboxRegistration" alignment="CENTER" maxHeight="70.0" maxWidth="250.0" visible="false" styleClass="dialogWindow">
+                <Label styleClass="lblDialogWindowTitle" text="Sign up" maxWidth="200.0"/>
+                <Label styleClass="lblLoginWindow" text="Login"/>
+                <TextField fx:id="tfRegLogin" maxWidth="200" onAction="#regPasswordFocus"/>
+                <Label styleClass="lblLoginWindow" text="Password"/>
+                <PasswordField fx:id="tfRegPassword" maxWidth="200" onAction="#regNickFocus"/>
+                <Label styleClass="lblLoginWindow" text="Nickname"/>
+                <TextField fx:id="tfRegNickname" maxWidth="200" onAction="#signUp"/>
+                <Button maxWidth="150" onAction="#signUp" styleClass="btnNotControl" text="Sign up"/>
+                <Button maxWidth="150" onAction="#swapLoginReg" styleClass="btnNotControl" text="To Sign in"/>
+            </VBox>
+            <VBox fx:id="vboxAbout" alignment="CENTER" maxHeight="70.0" maxWidth="150.0" visible="false" styleClass="dialogWindow">
                 <Label text="GB Chat"/>
                 <Label text="2019"/>
                 <Label text=" "/>

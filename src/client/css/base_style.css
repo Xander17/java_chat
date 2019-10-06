@@ -13,7 +13,7 @@
     -fx-border-width: 1 1 0 1;
 }
 
-#vboxNickname, #vboxAbout {
+.dialogWindow {
     -fx-border-color: -fx-border-gradient;
     -fx-border-width: 2;
     -fx-border-radius: 10;
@@ -26,19 +26,32 @@
     -fx-padding: 10;
 }
 
-#lblNickname {
+.lblDialogWindowTitle {
+    -fx-font-weight: bold;
+    -fx-font-family: "Arial Black";
+    -fx-font-size: 15px;
+    -fx-padding: 3 0 0 0;
+    -fx-border-width: 0 0 2 0;
+    -fx-border-style: solid;
+    -fx-border-color: -fx-bordercolor;
+    -fx-border-insets: 0 0 5 0;
+    -fx-alignment: center;
+}
+
+.lblLoginWindow {
     -fx-font-weight: bold;
     -fx-padding: 3;
 }
 
-.text-field {
+.text-field, .password-field {
     -fx-background-color: -fx-textfield-bg;
     -fx-border-color: -fx-bordercolor;
     -fx-border-width: 1;
     -fx-effect: innershadow(three-pass-box, dimgrey, 2, 0, 1, 1);
 }
 
-#tfNickname {
+.dialogWindow .text-field,
+.dialogWindow .password-field {
     -fx-background-radius: 5;
     -fx-border-radius: 5;
 }
@@ -51,6 +64,10 @@
     -fx-font-weight: bold;
     -fx-text-fill: -fx-font-color;
     -fx-effect: innershadow(three-pass-box, dimgrey, 2, 0, -1, -1);
+    -fx-background-radius: 5;
+    -fx-border-radius: 5;
+    -fx-border-insets: 5;
+    -fx-background-insets: 5;
 }
 
 .btnNotControl:hover {
@@ -62,11 +79,11 @@
     -fx-effect: innershadow(three-pass-box, dimgrey, 2, 0, 1, 1);
 }
 
-#btnOk {
-    -fx-background-radius: 5;
-    -fx-border-radius: 5;
-    -fx-border-insets: 5;
-    -fx-background-insets: 5;
+#btnSend {
+    -fx-background-radius: 0;
+    -fx-border-radius: 0;
+    -fx-border-insets: 0;
+    -fx-background-insets: 0;
 }
 
 .btnControl {

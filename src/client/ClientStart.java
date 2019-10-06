@@ -25,6 +25,12 @@ public class ClientStart extends Application {
         primaryStage.getIcons().add(new Image("client/img/icon.png"));
         primaryStage.initStyle(StageStyle.UNDECORATED);
         primaryStage.show();
+
+        /*FXMLLoader fxmlLoader = new FXMLLoader();
+        fxmlLoader.load(getClass().getResourceAsStream("client.fxml"));
+        Controller c = fxmlLoader.getController();
+        c.afterLoad();*/
+
     }
 
     public static void main(String[] args) {

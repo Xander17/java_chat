@@ -2,6 +2,7 @@ package consoleClient;
 
 public class ConsoleClientStart {
     public static void main(String[] args) {
-        new ConsoleClient();
+        // TODO: 06.10.2019 console reg, auth
+        //new ConsoleClient();
     }
 }

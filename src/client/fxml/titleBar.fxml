@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<BorderPane fx:id="titleBox" onMousePressed="#titlePressed" onMouseDragged="#titleDragged" xmlns="http://javafx.com/javafx"
+                xmlns:fx="http://javafx.com/fxml"
+                fx:controller="client.controller.TitleBarController">
+        <left>
+            <Label fx:id="titleLabel" text="GB Chat [No connection]"/>
+        </left>
+        <right>
+            <HBox alignment="CENTER_RIGHT" prefHeight="25.0">
+                <Button onAction="#minimize" prefHeight="25.0" prefWidth="30.0"
+                        styleClass="btnControl" text="_"/>
+                <Button onAction="#maximize" prefHeight="25.0" prefWidth="30.0"
+                        styleClass="btnControl" text="▬"/>
+                <Button onAction="#exitChat" prefHeight="25.0" prefWidth="30.0"
+                        styleClass="btnControl" text="X"/>
+            </HBox>
+        </right>
+    </BorderPane>

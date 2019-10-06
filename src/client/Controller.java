@@ -1,18 +1,17 @@
 package client;
 
+import client.controller.TitleBarController;
 import javafx.application.Platform;
-import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
-import javafx.geometry.Rectangle2D;
 import javafx.scene.control.*;
-import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.VBox;
-import javafx.stage.Screen;
-import javafx.stage.Stage;
 
-import java.io.*;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
 import java.net.Socket;
 import java.net.URL;
 import java.util.ResourceBundle;
@@ -20,26 +19,24 @@ import java.util.ResourceBundle;
 
 public class Controller implements Initializable {
     @FXML
-    Label titleLabel;
-    @FXML
-    BorderPane titleBox, mainPane;
+    BorderPane mainPane;
     @FXML
     ToggleGroup skinsGroup;
     @FXML
-    VBox vboxNickname, vboxAbout;
+    VBox vboxLogin, vboxRegistration, vboxAbout;
     @FXML
     TextArea taChat;
     @FXML
-    TextField tfMessage, tfNickname;
+    TextField tfMessage, tfLogin, tfRegLogin, tfRegNickname;
+    @FXML
+    PasswordField tfPassword, tfRegPassword;
     @FXML
     Button btnSend;
     @FXML
-    MenuItem mClear, mAbout, mNick;
+    MenuItem mClear, mAbout, mSignOut;
 
-    private String nickname;
-    private boolean isMaximized = false;
-    private double lastW, lastH;
-    private double dragX, dragY;
+    private String nickname = null;
+    private TitleBarController titleController;
 
     private DataInputStream inputStream = null;
     private DataOutputStream outputStream = null;
@@ -50,9 +47,14 @@ public class Controller implements Initializable {
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
+        getTitleController();
         runServerListener();
-        runConsoleHandler();
+        //runConsoleHandler();
     }
+
+/*    public void afterLoad() {
+        System.out.println("123");
+    }*/
 
     private void runServerListener() {
         try {
@@ -62,6 +64,7 @@ public class Controller implements Initializable {
             new Thread(() -> {
                 try {
                     String inputString;
+                    setTitleStatus();
                     while (true) {
                         inputString = inputStream.readUTF();
                         taChat.appendText(inputString + "\n");
@@ -74,11 +77,10 @@ public class Controller implements Initializable {
             }).start();
         } catch (IOException e) {
             System.out.println("Server connection error!");
-            setTitleStatus();
         }
     }
 
-    private void runConsoleHandler() {
+    /*private void runConsoleHandler() {
         Thread consoleThread = new Thread(() -> {
             BufferedReader consoleIn = new BufferedReader(new InputStreamReader(System.in));
             String consoleString;
@@ -96,23 +98,30 @@ public class Controller implements Initializable {
         });
         consoleThread.setDaemon(true);
         consoleThread.start();
+    }*/
+
+    private void getTitleController() {
+        FXMLLoader fxmlLoader = new FXMLLoader();
+        try {
+            fxmlLoader.load(getClass().getResourceAsStream("fxml/titleBar.fxml"));
+            titleController = fxmlLoader.getController();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     private void closeIOStreams() {
         try {
-            if (inputStream != null) inputStream.close();
-        } catch (IOException e) {
-            e.printStackTrace();
+            inputStream.close();
+        } catch (IOException | NullPointerException ignored) {
         }
         try {
-            if (outputStream != null) outputStream.close();
-        } catch (IOException e) {
-            e.printStackTrace();
+            outputStream.close();
+        } catch (IOException | NullPointerException ignored) {
         }
         try {
-            if (!socket.isClosed()) socket.close();
-        } catch (IOException e) {
-            e.printStackTrace();
+            socket.close();
+        } catch (IOException | NullPointerException ignored) {
         }
         Platform.runLater(this::setTitleStatus);
     }
@@ -140,28 +149,16 @@ public class Controller implements Initializable {
     }
 
     public void exitChat() {
-        closeIOStreams();
         Platform.exit();
         System.exit(0);
     }
 
-    public void setNickname() {
-        String s = tfNickname.getText().trim();
-        tfNickname.setText(s);
-        tfNickname.requestFocus();
-        if (!s.isEmpty()) {
-            nickname = tfNickname.getText();
-            setTitleStatus();
-            changeDisable(false);
-            vboxNickname.setVisible(false);
-            tfMessage.requestFocus();
-        }
+    public void loginToServer() {
+        System.out.println("LOGIN!");
+        setTitleStatus();
     }
 
-    public void changeNick() {
-        changeDisable(true);
-        vboxNickname.setVisible(true);
-        tfNickname.requestFocus();
+    public void signUp() {
     }
 
     public void aboutWindow() {
@@ -181,7 +178,7 @@ public class Controller implements Initializable {
         taChat.setDisable(status);
         mAbout.setDisable(status);
         mClear.setDisable(status);
-        mNick.setDisable(status);
+        mSignOut.setDisable(status);
     }
 
     public void setStyle() {
@@ -191,51 +188,43 @@ public class Controller implements Initializable {
         mainPane.getScene().getStylesheets().add(getClass().getResource(pathToCSS).toExternalForm());
     }
 
-    public void maximize() {
-        Stage stage = (Stage) titleBox.getScene().getWindow();
-        ObservableList<Screen> screens = Screen.getScreensForRectangle(new Rectangle2D(stage.getX(), stage.getY(), stage.getWidth(), stage.getHeight()));
-        Rectangle2D bounds = screens.get(0).getVisualBounds();
-        if (!isMaximized) {
-            saveWindowState(stage);
-            setWindowState(stage, bounds.getMinX(), bounds.getMinY(), bounds.getWidth(), bounds.getHeight());
-        } else {
-            double newX = bounds.getMinX() + (bounds.getMaxX() - bounds.getMinX() - lastW) / 2;
-            double newY = bounds.getMinY() + (bounds.getMaxY() - bounds.getMinY() - lastH) / 2;
-            setWindowState(stage, newX, newY, lastW, lastH);
-        }
-        isMaximized = !isMaximized;
-    }
-
-    private void saveWindowState(Stage stage) {
-        lastW = stage.getWidth();
-        lastH = stage.getHeight();
-    }
-
-    private void setWindowState(Stage stage, double x, double y, double width, double height) {
-        stage.setX(x);
-        stage.setY(y);
-        stage.setWidth(width);
-        stage.setHeight(height);
-    }
-
-    public void minimize() {
-        ((Stage) titleBox.getScene().getWindow()).setIconified(true);
-    }
-
-    public void titlePressed(MouseEvent mouseEvent) {
-        dragX = mouseEvent.getSceneX();
-        dragY = mouseEvent.getSceneY();
-    }
-
-    public void titleDragged(MouseEvent mouseEvent) {
-        Stage stage = (Stage) titleBox.getScene().getWindow();
-        stage.setX(mouseEvent.getScreenX() - dragX);
-        stage.setY(mouseEvent.getScreenY() - dragY);
-    }
-
     private void setTitleStatus() {
-        titleLabel.setText("GB Chat [Nickname: " + nickname + "]" +
-                (socket.isClosed() ? " [No connection]" : "[Connected to " + IP_ADDRESS + ":" + PORT + "]"));
+        String title = "GB Chat";
+        title += (nickname != null) ? " [Nickname: " + nickname + "]" : "";
+        title += (!isSocketOpen()) ? " [No connection]" : " [Connected to " + IP_ADDRESS + ":" + PORT + "]";
+        titleController.setTitle(title);
+    }
+
+    private boolean isSocketOpen() {
+        return socket != null && !socket.isClosed();
+    }
+
+    public void passwordFocus() {
+        tfPassword.requestFocus();
+    }
+
+    public void regPasswordFocus() {
+        tfRegPassword.requestFocus();
+    }
+
+    public void regNickFocus() {
+        tfRegNickname.requestFocus();
+    }
+
+    public void swapLoginReg() {
+        vboxLogin.setVisible(!vboxLogin.isVisible());
+        vboxRegistration.setVisible(!vboxLogin.isVisible());
+    }
+
+    public void disconnect() {
+        nickname = null;
+        taChat.clear();
+        closeIOStreams();
+        setLoginWindowState();
+    }
+
+    private void setLoginWindowState() {
+        vboxLogin.setVisible(true);
     }
 }
 
