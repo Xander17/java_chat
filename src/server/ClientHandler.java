@@ -34,7 +34,7 @@ class ClientHandler {
             } catch (IOException ignored) {
             } finally {
                 closeIOStreams();
-                mainServer.removeClient(this);
+                mainServer.deleteClient(this);
             }
         }).start();
     }

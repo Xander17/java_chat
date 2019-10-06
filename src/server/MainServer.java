@@ -29,7 +29,7 @@ class MainServer {
                 System.out.println("Server started.");
                 while (true) {
                     socket = server.accept();
-                    clients.add(new ClientHandler(this, socket));
+                    addClient(socket);
                     System.out.println("New client connected. " + getConnectionsCountInfo());
                 }
             } catch (IOException ignored) {
@@ -80,11 +80,15 @@ class MainServer {
     void broadcastMsg(String s) {
         if (clients.size() > 0) {
             SimpleDateFormat dateformat = new SimpleDateFormat("[HH:mm:ss] ");
-            clients.forEach(client -> client.sendMsg(dateformat.format(new Date())  + s));
+            clients.forEach(client -> client.sendMsg(dateformat.format(new Date()) + s));
         }
     }
 
-    void removeClient(ClientHandler client) {
+    void addClient(Socket socket) {
+        clients.add(new ClientHandler(this, socket));
+    }
+
+    void deleteClient(ClientHandler client) {
         clients.remove(client);
         System.out.println("Client disconnected. " + getConnectionsCountInfo());
     }
