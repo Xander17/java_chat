@@ -28,7 +28,6 @@ class ClientHandler {
                 while (true) {
                     String inputStr = inputStream.readUTF();
                     if (inputStr.equalsIgnoreCase(END_MESSAGE)) break;
-                    System.out.println(inputStr);
                     mainServer.broadcastMsg(inputStr);
                 }
             } catch (IOException ignored) {
@@ -39,7 +38,7 @@ class ClientHandler {
         }).start();
     }
 
-    public void closeIOStreams() {
+    void closeIOStreams() {
         sendMsg("Server: Connection closed.");
         try {
             if (inputStream != null) inputStream.close();

@@ -49,8 +49,7 @@ public class TitleBarController {
     }
 
     public void minimize() {
-        //((Stage) titleBox.getScene().getWindow()).setIconified(true);
-        setTitle("123");
+        ((Stage) titleBox.getScene().getWindow()).setIconified(true);
     }
 
     public void titlePressed(MouseEvent mouseEvent) {

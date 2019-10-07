@@ -3,7 +3,6 @@ package client;
 import client.controller.TitleBarController;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
 import javafx.scene.layout.BorderPane;
@@ -19,24 +18,28 @@ import java.util.ResourceBundle;
 
 public class Controller implements Initializable {
     @FXML
-    BorderPane mainPane;
+    private BorderPane mainPane;
     @FXML
-    ToggleGroup skinsGroup;
+    private ToggleGroup skinsGroup;
     @FXML
-    VBox vboxLogin, vboxRegistration, vboxAbout;
+    private VBox vboxLogin, vboxRegistration, vboxAbout;
     @FXML
-    TextArea taChat;
+    private TextArea taChat;
     @FXML
-    TextField tfMessage, tfLogin, tfRegLogin, tfRegNickname;
+    private TextField tfMessage, tfLogin, tfRegLogin, tfRegNickname;
     @FXML
-    PasswordField tfPassword, tfRegPassword;
+    private PasswordField tfPassword, tfRegPassword;
     @FXML
-    Button btnSend;
+    private Button btnSend;
     @FXML
-    MenuItem mClear, mAbout, mSignOut;
+    private MenuItem mClear, mAbout, mSignOut;
+    @FXML
+    private BorderPane titleBar;
+    @FXML
+    private TitleBarController titleBarController;
+
 
     private String nickname = null;
-    private TitleBarController titleController;
 
     private DataInputStream inputStream = null;
     private DataOutputStream outputStream = null;
@@ -47,14 +50,9 @@ public class Controller implements Initializable {
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
-        getTitleController();
         runServerListener();
-        //runConsoleHandler();
+        setTitleStatus();
     }
-
-/*    public void afterLoad() {
-        System.out.println("123");
-    }*/
 
     private void runServerListener() {
         try {
@@ -77,36 +75,6 @@ public class Controller implements Initializable {
             }).start();
         } catch (IOException e) {
             System.out.println("Server connection error!");
-        }
-    }
-
-    /*private void runConsoleHandler() {
-        Thread consoleThread = new Thread(() -> {
-            BufferedReader consoleIn = new BufferedReader(new InputStreamReader(System.in));
-            String consoleString;
-            try {
-                while (true) {
-                    consoleString = consoleIn.readLine();
-                    if (consoleString.trim().isEmpty()) continue;
-                    sendMsg("Console: " + consoleString);
-                }
-            } catch (IOException e) {
-                e.printStackTrace();
-            } finally {
-                closeIOStreams();
-            }
-        });
-        consoleThread.setDaemon(true);
-        consoleThread.start();
-    }*/
-
-    private void getTitleController() {
-        FXMLLoader fxmlLoader = new FXMLLoader();
-        try {
-            fxmlLoader.load(getClass().getResourceAsStream("fxml/titleBar.fxml"));
-            titleController = fxmlLoader.getController();
-        } catch (IOException e) {
-            e.printStackTrace();
         }
     }
 
@@ -154,8 +122,7 @@ public class Controller implements Initializable {
     }
 
     public void loginToServer() {
-        System.out.println("LOGIN!");
-        setTitleStatus();
+
     }
 
     public void signUp() {
@@ -192,7 +159,7 @@ public class Controller implements Initializable {
         String title = "GB Chat";
         title += (nickname != null) ? " [Nickname: " + nickname + "]" : "";
         title += (!isSocketOpen()) ? " [No connection]" : " [Connected to " + IP_ADDRESS + ":" + PORT + "]";
-        titleController.setTitle(title);
+        titleBarController.setTitle(title);
     }
 
     private boolean isSocketOpen() {
