@@ -1,20 +1,23 @@
-package server;
+package server.service;
+
+import resources.ControlMessage;
+import server.MainServer;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.Socket;
 
-class ClientHandler {
+public class ClientHandler {
+
+    private String nickname = null;
 
     private MainServer mainServer;
     private Socket socket;
     private DataInputStream inputStream = null;
     private DataOutputStream outputStream = null;
 
-    private final String END_MESSAGE = "/end";
-
-    ClientHandler(MainServer mainServer, Socket socket) {
+    public ClientHandler(MainServer mainServer, Socket socket) {
         this.mainServer = mainServer;
         this.socket = socket;
         startClientThread();
@@ -25,11 +28,8 @@ class ClientHandler {
             try {
                 inputStream = new DataInputStream(socket.getInputStream());
                 outputStream = new DataOutputStream(socket.getOutputStream());
-                while (true) {
-                    String inputStr = inputStream.readUTF();
-                    if (inputStr.equalsIgnoreCase(END_MESSAGE)) break;
-                    mainServer.broadcastMsg(inputStr);
-                }
+                getLoginPass();
+                getMessages();
             } catch (IOException ignored) {
             } finally {
                 closeIOStreams();
@@ -38,7 +38,32 @@ class ClientHandler {
         }).start();
     }
 
-    void closeIOStreams() {
+    private void getLoginPass() throws IOException {
+        String[] loginPassPair;
+        String inputStr;
+        while (true) {
+            inputStr = inputStream.readUTF();
+            loginPassPair = inputStr.split(" ", 3);
+            if (loginPassPair.length != 3 || !loginPassPair[0].equals(ControlMessage.AUTH.toString())) continue;
+            nickname = AuthService.getNickByLoginPass(loginPassPair[1], loginPassPair[2]);
+            if (nickname != null) {
+                sendMsg(ControlMessage.AUTH_OK.toString());
+                break;
+            }
+            else sendMsg(ControlMessage.AUTH_FAIL.toString());
+        }
+    }
+
+    private void getMessages() throws IOException {
+        String inputStr;
+        while (true) {
+            inputStr = inputStream.readUTF();
+            if (inputStr.equalsIgnoreCase(ControlMessage.CLOSE_CONNECTION.toString())) break;
+            mainServer.broadcastMsg(inputStr);
+        }
+    }
+
+    public void closeIOStreams() {
         sendMsg("Server: Connection closed.");
         try {
             if (inputStream != null) inputStream.close();
@@ -57,7 +82,7 @@ class ClientHandler {
         }
     }
 
-    void sendMsg(String s) {
+    public void sendMsg(String s) {
         if (!s.isEmpty() & !socket.isClosed()) {
             try {
                 outputStream.writeUTF(s);

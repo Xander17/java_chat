@@ -4,6 +4,8 @@
     -fx-bordercolor: #4d504f;
     -fx-base-lightcolor: #e0e6e0;
 
+    -fx-textcolor-alert: red;
+
     -fx-font-color: -fx-base-lightcolor;
     -fx-font-over-color: -fx-base-darkcolor;
 

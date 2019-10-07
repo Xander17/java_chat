@@ -43,11 +43,16 @@
     -fx-padding: 3;
 }
 
+#lblLoginInfo,#lblRegInfo {
+    -fx-text-fill: -fx-textcolor-alert;
+}
+
 .text-field, .password-field {
     -fx-background-color: -fx-textfield-bg;
     -fx-border-color: -fx-bordercolor;
     -fx-border-width: 1;
     -fx-effect: innershadow(three-pass-box, dimgrey, 2, 0, 1, 1);
+    -fx-alignment: center;
 }
 
 .dialogWindow .text-field,

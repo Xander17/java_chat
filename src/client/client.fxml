@@ -23,8 +23,9 @@
             <fx:include fx:id="titleBar" source="fxml/titleBar.fxml"/>
             <MenuBar fx:id="menuTop">
                 <Menu text="Chat">
-                    <MenuItem fx:id="mSignOut" disable="true" onAction="#disconnect" text="Sign Out"/>
                     <MenuItem fx:id="mClear" disable="true" onAction="#clearChat" text="Clear window"/>
+                    <MenuItem fx:id="mSignOut" disable="true" onAction="#signOut" text="Sign Out"/>
+                    <MenuItem fx:id="mDisconnect" disable="true" onAction="#disconnect" text="Disconnect"/>
                     <SeparatorMenuItem/>
                     <MenuItem onAction="#exitChat" text="Close"/>
                 </Menu>
@@ -53,8 +54,9 @@
                 <TextField fx:id="tfLogin" maxWidth="200" onAction="#passwordFocus"/>
                 <Label styleClass="lblLoginWindow" text="Password"/>
                 <PasswordField fx:id="tfPassword" maxWidth="200" onAction="#loginToServer"/>
-                <Button maxWidth="150" onAction="#loginToServer" styleClass="btnNotControl" text="Sign in"/>
-                <Button maxWidth="150" onAction="#swapLoginReg" styleClass="btnNotControl" text="To Sign up"/>
+                <Label fx:id="lblLoginInfo" styleClass="lblLoginWindow"/>
+                <Button fx:id="btnLogin" maxWidth="150" onAction="#loginToServer" styleClass="btnNotControl" text="Sign in"/>
+                <Button maxWidth="150" onAction="#swapLoginReg" styleClass="btnNotControl" text="To sign up ->"/>
             </VBox>
             <VBox fx:id="vboxRegistration" alignment="CENTER" maxHeight="70.0" maxWidth="250.0" visible="false"
                   styleClass="dialogWindow">
@@ -65,8 +67,9 @@
                 <PasswordField fx:id="tfRegPassword" maxWidth="200" onAction="#regNickFocus"/>
                 <Label styleClass="lblLoginWindow" text="Nickname"/>
                 <TextField fx:id="tfRegNickname" maxWidth="200" onAction="#signUp"/>
-                <Button maxWidth="150" onAction="#signUp" styleClass="btnNotControl" text="Sign up"/>
-                <Button maxWidth="150" onAction="#swapLoginReg" styleClass="btnNotControl" text="To Sign in"/>
+                <Label fx:id="lblRegInfo" styleClass="lblLoginWindow"/>
+                <Button fx:id="btnReg" maxWidth="150" onAction="#signUp" styleClass="btnNotControl" text="Sign up"/>
+                <Button maxWidth="150" onAction="#swapLoginReg" styleClass="btnNotControl" text="To sign in ->"/>
             </VBox>
             <VBox fx:id="vboxAbout" alignment="CENTER" maxHeight="70.0" maxWidth="150.0" visible="false"
                   styleClass="dialogWindow">

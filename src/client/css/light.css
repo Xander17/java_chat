@@ -4,6 +4,8 @@
     -fx-base-color3: #c3cbc7;
     -fx-base-lightcolor: #f0efee;
 
+    -fx-textcolor-alert: red;
+
     -fx-font-color: -fx-base-darkcolor;
     -fx-font-over-color: -fx-base-lightcolor;
 
@@ -19,12 +21,12 @@
     -fx-button-up-col1: -fx-base-lightcolor;
     -fx-button-up-col2: -fx-base-color3;
 
-    -fx-button-over-col:-fx-base-color3;
+    -fx-button-over-col: -fx-base-color3;
 
     -fx-button-down-col1: -fx-base-color3;
     -fx-button-down-col2: -fx-base-lightcolor;
 
-    -fx-scrollbar:-fx-base-lightcolor;
+    -fx-scrollbar: -fx-base-lightcolor;
     -fx-scroll-col1: -fx-base-color3;
     -fx-scroll-col2: -fx-base-lightcolor;
 

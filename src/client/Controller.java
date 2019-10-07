@@ -7,6 +7,8 @@ import javafx.fxml.Initializable;
 import javafx.scene.control.*;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.VBox;
+import resources.ControlMessage;
+import resources.LoginRegError;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -30,16 +32,18 @@ public class Controller implements Initializable {
     @FXML
     private PasswordField tfPassword, tfRegPassword;
     @FXML
-    private Button btnSend;
+    private Button btnSend, btnLogin, btnReg;
     @FXML
-    private MenuItem mClear, mAbout, mSignOut;
+    private MenuItem mClear, mAbout, mSignOut, mDisconnect;
+    @FXML
+    private Label lblLoginInfo, lblRegInfo;
     @FXML
     private BorderPane titleBar;
     @FXML
     private TitleBarController titleBarController;
 
-
     private String nickname = null;
+    private boolean loginState = true;
 
     private DataInputStream inputStream = null;
     private DataOutputStream outputStream = null;
@@ -59,22 +63,67 @@ public class Controller implements Initializable {
             socket = new Socket(IP_ADDRESS, PORT);
             inputStream = new DataInputStream(socket.getInputStream());
             outputStream = new DataOutputStream(socket.getOutputStream());
+            mDisconnect.setDisable(false);
             new Thread(() -> {
                 try {
-                    String inputString;
-                    setTitleStatus();
-                    while (true) {
-                        inputString = inputStream.readUTF();
-                        taChat.appendText(inputString + "\n");
-                    }
+                    loginRegWindow();
+                    getMessages();
                 } catch (IOException ignored) {
                 } finally {
                     closeIOStreams();
                 }
-
             }).start();
         } catch (IOException e) {
             System.out.println("Server connection error!");
+        }
+    }
+
+    private void loginRegWindow() throws IOException {
+        String inputString;
+        while (true) {
+            inputString = inputStream.readUTF();
+            if (ControlMessage.AUTH_OK.check(inputString) && vboxLogin.isVisible()) {
+                setLoginState(false);
+                break;
+            } else if (ControlMessage.AUTH_FAIL.check(inputString) && vboxLogin.isVisible()) {
+                setLoginInfo(LoginRegError.INCORRECT_LOGIN_PASS);
+            } else if (ControlMessage.REG_OK.check(inputString) && vboxRegistration.isVisible()) {
+                String login = tfRegLogin.getText().trim();
+                String pass = tfRegPassword.getText();
+                swapLoginReg();
+                tfLogin.setText(login);
+                tfPassword.setText(pass);
+            } else if (ControlMessage.REG_LOGIN_EXISTS.check(inputString) && vboxRegistration.isVisible()) {
+                setRegInfo(LoginRegError.LOGIN_EXISTS);
+            } else if (ControlMessage.REG_NICKNAME_EXISTS.check(inputString) && vboxRegistration.isVisible()) {
+                setRegInfo(LoginRegError.NICKNAME_EXISTS);
+            }
+        }
+    }
+
+    private void getMessages() throws IOException {
+        String inputString;
+        while (true) {
+            inputString = inputStream.readUTF();
+            taChat.appendText(inputString + "\n");
+        }
+    }
+
+    private void setLoginInfo(LoginRegError s) {
+        Platform.runLater(() -> lblLoginInfo.setText(s.toString()));
+    }
+
+    private void setRegInfo(LoginRegError s) {
+        Platform.runLater(() -> lblRegInfo.setText(s.toString()));
+        switch (s) {
+            case LOGIN_EXISTS:
+                tfRegLogin.clear();
+                tfRegLogin.requestFocus();
+                break;
+            case NICKNAME_EXISTS:
+                tfRegNickname.clear();
+                tfRegNickname.requestFocus();
+                break;
         }
     }
 
@@ -91,6 +140,7 @@ public class Controller implements Initializable {
             socket.close();
         } catch (IOException | NullPointerException ignored) {
         }
+        mDisconnect.setDisable(true);
         Platform.runLater(this::setTitleStatus);
     }
 
@@ -98,9 +148,13 @@ public class Controller implements Initializable {
         sendMsg(tfMessage.getText());
     }
 
+    private void sendMsg(String... strings) {
+        sendMsg(String.join(" ", strings));
+    }
+
     private void sendMsg(String s) {
         s = s.trim();
-        if (!s.isEmpty() & !socket.isClosed()) {
+        if (!s.isEmpty() & !isSocketOpen()) {
             try {
                 outputStream.writeUTF(s);
             } catch (IOException e) {
@@ -122,24 +176,33 @@ public class Controller implements Initializable {
     }
 
     public void loginToServer() {
-
+        btnLogin.requestFocus();
+        String login = tfLogin.getText().trim();
+        String pass = tfPassword.getText();
+        if (!isSocketOpen()) setLoginInfo(LoginRegError.NO_CONNECTION);
+        else if (!login.isEmpty() && !pass.isEmpty()) {
+            sendMsg(ControlMessage.AUTH.toString(), login, pass);
+        } else {
+            tfLogin.setText(login);
+            setLoginInfo(LoginRegError.NOT_ENOUGH_DATA);
+        }
     }
 
     public void signUp() {
     }
 
     public void aboutWindow() {
-        changeDisable(true);
+        setFieldsDisable(true);
         vboxAbout.setVisible(true);
     }
 
     public void aboutWindowClose() {
-        changeDisable(false);
+        setFieldsDisable(false);
         vboxAbout.setVisible(false);
         tfMessage.requestFocus();
     }
 
-    private void changeDisable(boolean status) {
+    private void setFieldsDisable(boolean status) {
         btnSend.setDisable(status);
         tfMessage.setDisable(status);
         taChat.setDisable(status);
@@ -181,17 +244,31 @@ public class Controller implements Initializable {
     public void swapLoginReg() {
         vboxLogin.setVisible(!vboxLogin.isVisible());
         vboxRegistration.setVisible(!vboxLogin.isVisible());
+        tfLogin.clear();
+        tfPassword.clear();
+        tfRegLogin.clear();
+        tfRegPassword.clear();
+        tfRegNickname.clear();
+        lblRegInfo.setText("");
+        lblLoginInfo.setText("");
+    }
+
+    public void signOut() {
+        nickname = null;
+        taChat.clear();
+        setLoginState(true);
+    }
+
+    private void setLoginState(boolean status) {
+        setFieldsDisable(status);
+        if (status) lblLoginInfo.setText("");
+        vboxLogin.setVisible(status);
+        loginState = status;
     }
 
     public void disconnect() {
-        nickname = null;
-        taChat.clear();
         closeIOStreams();
-        setLoginWindowState();
-    }
-
-    private void setLoginWindowState() {
-        vboxLogin.setVisible(true);
+        if (!loginState) signOut();
     }
 }
 

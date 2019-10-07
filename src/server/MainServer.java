@@ -1,5 +1,9 @@
 package server;
 
+import resources.ControlMessage;
+import server.service.AuthService;
+import server.service.ClientHandler;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -9,7 +13,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Vector;
 
-class MainServer {
+public class MainServer {
     private Vector<ClientHandler> clients = new Vector<>();
     private ServerSocket server = null;
     private Socket socket = null;
@@ -25,6 +29,7 @@ class MainServer {
     private void runServer() {
         new Thread(() -> {
             try {
+                AuthService.connect();
                 server = new ServerSocket(SOCKET_PORT);
                 System.out.println("Server started.");
                 while (true) {
@@ -47,7 +52,7 @@ class MainServer {
                 while (true) {
                     consoleString = consoleIn.readLine();
                     if (consoleString.trim().isEmpty()) continue;
-                    if (consoleString.equalsIgnoreCase(END_MESSAGE)) break;
+                    if (consoleString.equalsIgnoreCase(ControlMessage.CLOSE_CONNECTION.toString())) break;
                     else broadcastMsg("Server: " + consoleString);
                 }
             } catch (IOException e) {
@@ -77,18 +82,18 @@ class MainServer {
         }
     }
 
-    void broadcastMsg(String s) {
+    public void broadcastMsg(String s) {
         if (clients.size() > 0) {
             SimpleDateFormat dateformat = new SimpleDateFormat("[HH:mm:ss] ");
             clients.forEach(client -> client.sendMsg(dateformat.format(new Date()) + s));
         }
     }
 
-    void addClient(Socket socket) {
+    private void addClient(Socket socket) {
         clients.add(new ClientHandler(this, socket));
     }
 
-    void deleteClient(ClientHandler client) {
+    public void deleteClient(ClientHandler client) {
         clients.remove(client);
         System.out.println("Client disconnected. " + getConnectionsCountInfo());
     }

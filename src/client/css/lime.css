@@ -4,6 +4,8 @@
     -fx-base-color3: #e7ffae;
     -fx-base-lightcolor: #fcffd2;
 
+    -fx-textcolor-alert: red;
+
     -fx-font-color: -fx-base-darkcolor;
     -fx-font-over-color: -fx-base-lightcolor;
 
