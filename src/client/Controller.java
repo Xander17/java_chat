@@ -79,24 +79,23 @@ public class Controller implements Initializable {
     }
 
     private void loginRegWindow() throws IOException {
-        String inputString;
+        String[] inputString;
         while (true) {
-            inputString = inputStream.readUTF();
-            if (ControlMessage.AUTH_OK.check(inputString) && vboxLogin.isVisible()) {
+            inputString = inputStream.readUTF().split(" ", 2);
+            if (ControlMessage.AUTH_OK.check(inputString[0]) && vboxLogin.isVisible()) {
+                nickname=inputString[1];
                 setLoginState(false);
                 break;
-            } else if (ControlMessage.AUTH_FAIL.check(inputString) && vboxLogin.isVisible()) {
-                setLoginInfo(LoginRegError.INCORRECT_LOGIN_PASS);
-            } else if (ControlMessage.REG_OK.check(inputString) && vboxRegistration.isVisible()) {
+            } else if (ControlMessage.ERROR.check(inputString[0]) && vboxLogin.isVisible()) {
+                setLoginInfo(inputString[1]);
+            } else if (ControlMessage.REG_OK.check(inputString[0]) && vboxRegistration.isVisible()) {
                 String login = tfRegLogin.getText().trim();
                 String pass = tfRegPassword.getText();
                 swapLoginReg();
                 tfLogin.setText(login);
                 tfPassword.setText(pass);
-            } else if (ControlMessage.REG_LOGIN_EXISTS.check(inputString) && vboxRegistration.isVisible()) {
-                setRegInfo(LoginRegError.LOGIN_EXISTS);
-            } else if (ControlMessage.REG_NICKNAME_EXISTS.check(inputString) && vboxRegistration.isVisible()) {
-                setRegInfo(LoginRegError.NICKNAME_EXISTS);
+            } else if (ControlMessage.ERROR.check(inputString[0]) && vboxRegistration.isVisible()) {
+                setRegInfo(inputString[1]);
             }
         }
     }
@@ -109,22 +108,50 @@ public class Controller implements Initializable {
         }
     }
 
-    private void setLoginInfo(LoginRegError s) {
-        Platform.runLater(() -> lblLoginInfo.setText(s.toString()));
+    private void setLoginInfo(String s) {
+        LoginRegError error = getErrorString(s);
+        setLoginInfo(error);
     }
 
-    private void setRegInfo(LoginRegError s) {
-        Platform.runLater(() -> lblRegInfo.setText(s.toString()));
-        switch (s) {
-            case LOGIN_EXISTS:
-                tfRegLogin.clear();
-                tfRegLogin.requestFocus();
-                break;
-            case NICKNAME_EXISTS:
-                tfRegNickname.clear();
-                tfRegNickname.requestFocus();
-                break;
+    private void setLoginInfo(LoginRegError error) {
+        Platform.runLater(() -> {
+            lblLoginInfo.setText(error.toString());
+            tfLogin.requestFocus();
+        });
+    }
+
+    private void setRegInfo(String s) {
+        LoginRegError error = getErrorString(s);
+        setRegInfo(error);
+    }
+
+    private void setRegInfo(LoginRegError error) {
+        Platform.runLater(() -> {
+            lblRegInfo.setText(error.toString());
+            switch (error) {
+                case LOGIN_EXISTS:
+                    tfRegLogin.clear();
+                    tfRegLogin.requestFocus();
+                    break;
+                case NICKNAME_EXISTS:
+                    tfRegNickname.clear();
+                    tfRegNickname.requestFocus();
+                    break;
+            }
+        });
+    }
+
+    private LoginRegError getErrorString(String index) {
+        LoginRegError errorString;
+        try {
+            int i = Integer.parseInt(index);
+            if (i < LoginRegError.values().length)
+                errorString = LoginRegError.values()[i];
+            else errorString = LoginRegError.RESPONSE_ERROR;
+        } catch (NumberFormatException e) {
+            errorString = LoginRegError.RESPONSE_ERROR;
         }
+        return errorString;
     }
 
     private void closeIOStreams() {
@@ -148,13 +175,13 @@ public class Controller implements Initializable {
         sendMsg(tfMessage.getText());
     }
 
-    private void sendMsg(String... strings) {
-        sendMsg(String.join(" ", strings));
+    private void sendMsg(ControlMessage c, String... strings) {
+        sendMsg(String.join(" ", c.toString(), String.join(" ", strings)));
     }
 
     private void sendMsg(String s) {
         s = s.trim();
-        if (!s.isEmpty() & !isSocketOpen()) {
+        if (!s.isEmpty() & isSocketOpen()) {
             try {
                 outputStream.writeUTF(s);
             } catch (IOException e) {
@@ -178,17 +205,36 @@ public class Controller implements Initializable {
     public void loginToServer() {
         btnLogin.requestFocus();
         String login = tfLogin.getText().trim();
-        String pass = tfPassword.getText();
+        String pass = getPasswordString(tfPassword.getText());
         if (!isSocketOpen()) setLoginInfo(LoginRegError.NO_CONNECTION);
         else if (!login.isEmpty() && !pass.isEmpty()) {
-            sendMsg(ControlMessage.AUTH.toString(), login, pass);
+            sendMsg(ControlMessage.AUTH, login, pass);
         } else {
             tfLogin.setText(login);
             setLoginInfo(LoginRegError.NOT_ENOUGH_DATA);
         }
     }
 
+    private String getPasswordString(String s) {
+        return s.trim()
+                .replace(" ", "%20")
+                .replace("\"", "\\\"")
+                .replace("'", "\\'");
+    }
+
     public void signUp() {
+        btnReg.requestFocus();
+        String login = tfRegLogin.getText().trim();
+        String pass = getPasswordString(tfRegPassword.getText());
+        String nick = tfRegNickname.getText().trim();
+        if (!isSocketOpen()) setRegInfo(LoginRegError.NO_CONNECTION);
+        else if (!login.isEmpty() && !pass.isEmpty() && !nick.isEmpty()) {
+            sendMsg(ControlMessage.REG, login, pass, nick);
+        } else {
+            tfRegLogin.setText(login);
+            tfRegNickname.setText(nick);
+            setRegInfo(LoginRegError.NOT_ENOUGH_DATA);
+        }
     }
 
     public void aboutWindow() {
@@ -249,8 +295,10 @@ public class Controller implements Initializable {
         tfRegLogin.clear();
         tfRegPassword.clear();
         tfRegNickname.clear();
-        lblRegInfo.setText("");
-        lblLoginInfo.setText("");
+        Platform.runLater(() -> {
+            lblRegInfo.setText("");
+            lblLoginInfo.setText("");
+        });
     }
 
     public void signOut() {
@@ -264,6 +312,7 @@ public class Controller implements Initializable {
         if (status) lblLoginInfo.setText("");
         vboxLogin.setVisible(status);
         loginState = status;
+        setTitleStatus();
     }
 
     public void disconnect() {

@@ -3,14 +3,13 @@ package server;
 import resources.ControlMessage;
 import server.service.AuthService;
 import server.service.ClientHandler;
+import server.service.MessageFormat;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.Vector;
 
 public class MainServer {
@@ -53,7 +52,7 @@ public class MainServer {
                     consoleString = consoleIn.readLine();
                     if (consoleString.trim().isEmpty()) continue;
                     if (consoleString.equalsIgnoreCase(ControlMessage.CLOSE_CONNECTION.toString())) break;
-                    else broadcastMsg("Server: " + consoleString);
+                    else broadcastMsg("Server",consoleString);
                 }
             } catch (IOException e) {
                 e.printStackTrace();
@@ -71,8 +70,10 @@ public class MainServer {
     }
 
     private void serverShutDown() {
+
         try {
             clients.forEach(ClientHandler::closeIOStreams);
+            AuthService.shutdown();
             if (!server.isClosed()) {
                 server.close();
                 System.out.println("Server stopped.");
@@ -82,11 +83,22 @@ public class MainServer {
         }
     }
 
-    public void broadcastMsg(String s) {
+    public void broadcastMsg(String srcNickname, String s) {
         if (clients.size() > 0) {
-            SimpleDateFormat dateformat = new SimpleDateFormat("[HH:mm:ss] ");
-            clients.forEach(client -> client.sendMsg(dateformat.format(new Date()) + s));
+            s = MessageFormat.broadcast(srcNickname, s);
+            for (ClientHandler client : clients) {
+                client.sendMsg(s);
+            }
         }
+    }
+
+    public void whisper(ClientHandler srcClient, String dstNickname, String message) {
+        ClientHandler dstClient = getClientByNickname(dstNickname);
+        if (dstClient != null) {
+            message = MessageFormat.whisper(srcClient.getNickname(), dstNickname, message);
+            srcClient.sendMsg(message);
+            dstClient.sendMsg(message);
+        } else srcClient.sendMsg("User " + dstNickname + " is not online");
     }
 
     private void addClient(Socket socket) {
@@ -96,5 +108,19 @@ public class MainServer {
     public void deleteClient(ClientHandler client) {
         clients.remove(client);
         System.out.println("Client disconnected. " + getConnectionsCountInfo());
+    }
+
+    private ClientHandler getClientByNickname(String nickname) {
+        for (ClientHandler client : clients) {
+            if (client.getNickname().equals(nickname)) return client;
+        }
+        return null;
+    }
+
+    public boolean isUserOnline(String nickname) {
+        for (ClientHandler client : clients) {
+            if (client.getNickname().equals(nickname)) return true;
+        }
+        return false;
     }
 }

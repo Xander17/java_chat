@@ -52,13 +52,13 @@
     -fx-border-color: -fx-bordercolor;
     -fx-border-width: 1;
     -fx-effect: innershadow(three-pass-box, dimgrey, 2, 0, 1, 1);
-    -fx-alignment: center;
 }
 
 .dialogWindow .text-field,
 .dialogWindow .password-field {
     -fx-background-radius: 5;
     -fx-border-radius: 5;
+    -fx-alignment: center;
 }
 
 .btnNotControl {

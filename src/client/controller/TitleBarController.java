@@ -62,12 +62,13 @@ public class TitleBarController {
         stage.setX(mouseEvent.getScreenX() - dragX);
         stage.setY(mouseEvent.getScreenY() - dragY);
     }
+
     public void exitChat() {
         Platform.exit();
         System.exit(0);
     }
 
     public void setTitle(String title) {
-        titleLabel.setText(title);
+        Platform.runLater(() -> titleLabel.setText(title));
     }
 }

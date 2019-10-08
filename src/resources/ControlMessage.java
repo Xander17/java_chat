@@ -4,10 +4,10 @@ public enum ControlMessage {
     CLOSE_CONNECTION("/end"),
     AUTH("/auth"),
     AUTH_OK("/authok"),
-    AUTH_FAIL("/authfail"),
+    ERROR("/error"),
+    REG("/reg"),
     REG_OK("/regok"),
-    REG_LOGIN_EXISTS("/reglogin"),
-    REG_NICKNAME_EXISTS("/regnick");
+    WHISPER("/w");
 
     private String message;
 
