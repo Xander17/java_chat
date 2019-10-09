@@ -5,22 +5,7 @@ import resources.LoginRegError;
 import java.sql.*;
 
 public class AuthService {
-    private static Connection connection;
-    private static Statement statement;
-
-    private final static String DB_NAME = "DB/java_chat.db";
-
-    public static void connect() {
-        try {
-            Class.forName("org.sqlite.JDBC");
-            connection = DriverManager.getConnection("jdbc:sqlite:" + DB_NAME);
-            statement = connection.createStatement();
-            System.out.println("Clients DB connected.");
-        } catch (Exception e) {
-            e.printStackTrace();
-            System.out.println("Clients DB connection failed.");
-        }
-    }
+    private static Statement statement = DatabaseSQL.getStatement();
 
     static String getNickByLoginPass(String login, String pass) {
         String query = String.format("select nickname from clients where login='%s' and password='%s'", login, pass);
@@ -56,12 +41,4 @@ public class AuthService {
         return result.next();
     }
 
-    public static void shutdown() {
-        try {
-            connection.close();
-            System.out.println("Clients DB stopped.");
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-    }
 }

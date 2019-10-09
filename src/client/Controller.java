@@ -9,6 +9,7 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.VBox;
 import resources.ControlMessage;
 import resources.LoginRegError;
+import server.service.FormatChecker;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -226,11 +227,12 @@ public class Controller implements Initializable {
         String login = tfRegLogin.getText().trim();
         String pass = getPasswordString(tfRegPassword.getText());
         String nick = tfRegNickname.getText().trim();
+        FormatChecker formatChecker = new FormatChecker();
         if (!isSocketOpen()) setRegInfo(LoginRegError.NO_CONNECTION);
-        else if (!checkLoginFormat(login)) {
-        } else if (!checkPasswordFormat(pass)) {
-        } else if (!checkNicknameFormat(nick)) {
-        } else if (!login.isEmpty() && !pass.isEmpty() && !nick.isEmpty()) {
+        else if (!formatChecker.checkLoginFormat(login)) setRegInfo(formatChecker.getCurrentError());
+        else if (!formatChecker.checkPasswordFormat(pass)) setRegInfo(formatChecker.getCurrentError());
+        else if (!formatChecker.checkNicknameFormat(nick)) setRegInfo(formatChecker.getCurrentError());
+        else if (!login.isEmpty() && !pass.isEmpty() && !nick.isEmpty()) {
             sendMsg(ControlMessage.REG, login, pass, nick);
         } else {
             Platform.runLater(() -> {
@@ -241,56 +243,6 @@ public class Controller implements Initializable {
         }
     }
 
-    private boolean checkLoginFormat(String s) {
-        if (!s.matches(".{5,}")) {
-            setRegInfo(LoginRegError.LOGIN_MIN_LENGTH);
-            return false;
-        } else if (!s.matches("^[A-Za-z].*")) {
-            setRegInfo(LoginRegError.LOGIN_FIRST_LETTER);
-            return false;
-        } else if (!s.matches("\\w+")) {
-            setRegInfo(LoginRegError.LOGIN_LETTERS_DIGITS);
-            return false;
-        } else if (!s.matches(".{5,20}")) {
-            setRegInfo(LoginRegError.LOGIN_MAX_LENGTH);
-            return false;
-        }
-        return true;
-    }
-
-    private boolean checkPasswordFormat(String s) {
-        if (!s.matches(".{8,}")) {
-            setRegInfo(LoginRegError.PASS_MIN_LENGTH);
-            return false;
-        } else if (!s.matches(".*[A-ZА-Я].*")) {
-            setRegInfo(LoginRegError.PASS_CAPITAL_LETTER);
-            return false;
-        } else if (!s.matches(".*[a-zа-я].*")) {
-            setRegInfo(LoginRegError.PASS_LOWERCASE_LETTER);
-            return false;
-        } else if (!s.matches(".*\\d.*")) {
-            setRegInfo(LoginRegError.PASS_DIGITS);
-            return false;
-        } else if (!s.matches(".{8,30}")) {
-            setRegInfo(LoginRegError.PASS_MAX_LENGTH);
-            return false;
-        }
-        return true;
-    }
-
-    private boolean checkNicknameFormat(String s) {
-        if (!s.matches(".{5,}")) {
-            setRegInfo(LoginRegError.NICK_MIN_LENGTH);
-            return false;
-        } else if (!s.matches("\\w+")) {
-            setRegInfo(LoginRegError.NICK_FORMAT);
-            return false;
-        } else if (!s.matches(".{5,20}")) {
-            setRegInfo(LoginRegError.NICK_MAX_LENGTH);
-            return false;
-        }
-        return true;
-    }
 
     public void aboutWindow() {
         setFieldsDisable(true);

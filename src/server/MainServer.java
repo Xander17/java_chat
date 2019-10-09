@@ -1,8 +1,8 @@
 package server;
 
 import resources.ControlMessage;
-import server.service.AuthService;
 import server.service.ClientHandler;
+import server.service.DatabaseSQL;
 import server.service.MessageFormat;
 
 import java.io.BufferedReader;
@@ -18,7 +18,6 @@ public class MainServer {
     private Socket socket = null;
 
     private final int SOCKET_PORT = 8190;
-    private final String END_MESSAGE = "/end";
 
     MainServer() {
         runServer();
@@ -28,7 +27,7 @@ public class MainServer {
     private void runServer() {
         new Thread(() -> {
             try {
-                AuthService.connect();
+                DatabaseSQL.connect();
                 server = new ServerSocket(SOCKET_PORT);
                 System.out.println("Server started.");
                 while (true) {
@@ -73,7 +72,7 @@ public class MainServer {
 
         try {
             clients.forEach(ClientHandler::closeIOStreams);
-            AuthService.shutdown();
+            DatabaseSQL.shutdown();
             if (!server.isClosed()) {
                 server.close();
                 System.out.println("Server stopped.");
