@@ -24,7 +24,7 @@
             <MenuBar fx:id="menuTop">
                 <Menu text="Chat">
                     <MenuItem fx:id="mClear" disable="true" onAction="#clearChat" text="Clear window"/>
-                    <MenuItem fx:id="mSignOut" disable="true" onAction="#signOut" text="Sign Out"/>
+                    <!--<MenuItem fx:id="mSignOut" disable="true" onAction="#signOut" text="Sign Out"/>-->
                     <MenuItem fx:id="mDisconnect" disable="true" onAction="#disconnect" text="Disconnect"/>
                     <SeparatorMenuItem/>
                     <MenuItem onAction="#exitChat" text="Close"/>

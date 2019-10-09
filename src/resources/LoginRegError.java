@@ -9,7 +9,19 @@ public enum LoginRegError {
     NICKNAME_EXISTS("Nickname already exists"),
     REG_ERROR("Registration fail"),
     DB_ERROR("DB error"),
-    RESPONSE_ERROR("Server response error");
+    RESPONSE_ERROR("Server response error"),
+    LOGIN_FIRST_LETTER("First symbol in login should be a letter"),
+    LOGIN_LETTERS_DIGITS("Only word chars are allowed for login"),
+    LOGIN_MIN_LENGTH("Login should be 5 chars minimum"),
+    LOGIN_MAX_LENGTH("Login should be 20 chars maximum"),
+    PASS_CAPITAL_LETTER("Password needs capital letters"),
+    PASS_LOWERCASE_LETTER("Password needs lowercase letters"),
+    PASS_DIGITS("Password needs digits"),
+    PASS_MIN_LENGTH("Password should be 8 chars minimum"),
+    PASS_MAX_LENGTH("Password should be 30 chars maximum"),
+    NICK_FORMAT("Only word chars are allowed for nickname"),
+    NICK_MIN_LENGTH("Nickname should be 5 chars minimum"),
+    NICK_MAX_LENGTH("Nickname should be 20 chars maximum");
 
     private String message;
 

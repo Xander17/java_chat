@@ -83,7 +83,7 @@ public class Controller implements Initializable {
         while (true) {
             inputString = inputStream.readUTF().split(" ", 2);
             if (ControlMessage.AUTH_OK.check(inputString[0]) && vboxLogin.isVisible()) {
-                nickname=inputString[1];
+                nickname = inputString[1];
                 setLoginState(false);
                 break;
             } else if (ControlMessage.ERROR.check(inputString[0]) && vboxLogin.isVisible()) {
@@ -91,9 +91,7 @@ public class Controller implements Initializable {
             } else if (ControlMessage.REG_OK.check(inputString[0]) && vboxRegistration.isVisible()) {
                 String login = tfRegLogin.getText().trim();
                 String pass = tfRegPassword.getText();
-                swapLoginReg();
-                tfLogin.setText(login);
-                tfPassword.setText(pass);
+                swapLoginReg(login, pass);
             } else if (ControlMessage.ERROR.check(inputString[0]) && vboxRegistration.isVisible()) {
                 setRegInfo(inputString[1]);
             }
@@ -168,7 +166,7 @@ public class Controller implements Initializable {
         } catch (IOException | NullPointerException ignored) {
         }
         mDisconnect.setDisable(true);
-        Platform.runLater(this::setTitleStatus);
+        setTitleStatus();
     }
 
     public void sendMsg() {
@@ -210,7 +208,7 @@ public class Controller implements Initializable {
         else if (!login.isEmpty() && !pass.isEmpty()) {
             sendMsg(ControlMessage.AUTH, login, pass);
         } else {
-            tfLogin.setText(login);
+            Platform.runLater(() -> tfLogin.setText(login));
             setLoginInfo(LoginRegError.NOT_ENOUGH_DATA);
         }
     }
@@ -218,6 +216,7 @@ public class Controller implements Initializable {
     private String getPasswordString(String s) {
         return s.trim()
                 .replace(" ", "%20")
+                .replace("\\", "\\\\")
                 .replace("\"", "\\\"")
                 .replace("'", "\\'");
     }
@@ -228,13 +227,69 @@ public class Controller implements Initializable {
         String pass = getPasswordString(tfRegPassword.getText());
         String nick = tfRegNickname.getText().trim();
         if (!isSocketOpen()) setRegInfo(LoginRegError.NO_CONNECTION);
-        else if (!login.isEmpty() && !pass.isEmpty() && !nick.isEmpty()) {
+        else if (!checkLoginFormat(login)) {
+        } else if (!checkPasswordFormat(pass)) {
+        } else if (!checkNicknameFormat(nick)) {
+        } else if (!login.isEmpty() && !pass.isEmpty() && !nick.isEmpty()) {
             sendMsg(ControlMessage.REG, login, pass, nick);
         } else {
-            tfRegLogin.setText(login);
-            tfRegNickname.setText(nick);
-            setRegInfo(LoginRegError.NOT_ENOUGH_DATA);
+            Platform.runLater(() -> {
+                tfRegLogin.setText(login);
+                tfRegNickname.setText(nick);
+                setRegInfo(LoginRegError.NOT_ENOUGH_DATA);
+            });
         }
+    }
+
+    private boolean checkLoginFormat(String s) {
+        if (!s.matches(".{5,}")) {
+            setRegInfo(LoginRegError.LOGIN_MIN_LENGTH);
+            return false;
+        } else if (!s.matches("^[A-Za-z].*")) {
+            setRegInfo(LoginRegError.LOGIN_FIRST_LETTER);
+            return false;
+        } else if (!s.matches("\\w+")) {
+            setRegInfo(LoginRegError.LOGIN_LETTERS_DIGITS);
+            return false;
+        } else if (!s.matches(".{5,20}")) {
+            setRegInfo(LoginRegError.LOGIN_MAX_LENGTH);
+            return false;
+        }
+        return true;
+    }
+
+    private boolean checkPasswordFormat(String s) {
+        if (!s.matches(".{8,}")) {
+            setRegInfo(LoginRegError.PASS_MIN_LENGTH);
+            return false;
+        } else if (!s.matches(".*[A-ZА-Я].*")) {
+            setRegInfo(LoginRegError.PASS_CAPITAL_LETTER);
+            return false;
+        } else if (!s.matches(".*[a-zа-я].*")) {
+            setRegInfo(LoginRegError.PASS_LOWERCASE_LETTER);
+            return false;
+        } else if (!s.matches(".*\\d.*")) {
+            setRegInfo(LoginRegError.PASS_DIGITS);
+            return false;
+        } else if (!s.matches(".{8,30}")) {
+            setRegInfo(LoginRegError.PASS_MAX_LENGTH);
+            return false;
+        }
+        return true;
+    }
+
+    private boolean checkNicknameFormat(String s) {
+        if (!s.matches(".{5,}")) {
+            setRegInfo(LoginRegError.NICK_MIN_LENGTH);
+            return false;
+        } else if (!s.matches("\\w+")) {
+            setRegInfo(LoginRegError.NICK_FORMAT);
+            return false;
+        } else if (!s.matches(".{5,20}")) {
+            setRegInfo(LoginRegError.NICK_MAX_LENGTH);
+            return false;
+        }
+        return true;
     }
 
     public void aboutWindow() {
@@ -249,12 +304,14 @@ public class Controller implements Initializable {
     }
 
     private void setFieldsDisable(boolean status) {
-        btnSend.setDisable(status);
-        tfMessage.setDisable(status);
-        taChat.setDisable(status);
-        mAbout.setDisable(status);
-        mClear.setDisable(status);
-        mSignOut.setDisable(status);
+        Platform.runLater(() -> {
+            btnSend.setDisable(status);
+            tfMessage.setDisable(status);
+            taChat.setDisable(status);
+            mAbout.setDisable(status);
+            mClear.setDisable(status);
+            // mSignOut.setDisable(status);
+        });
     }
 
     public void setStyle() {
@@ -288,14 +345,18 @@ public class Controller implements Initializable {
     }
 
     public void swapLoginReg() {
-        vboxLogin.setVisible(!vboxLogin.isVisible());
-        vboxRegistration.setVisible(!vboxLogin.isVisible());
-        tfLogin.clear();
-        tfPassword.clear();
-        tfRegLogin.clear();
-        tfRegPassword.clear();
-        tfRegNickname.clear();
+        swapLoginReg("", "");
+    }
+
+    public void swapLoginReg(String login, String pass) {
         Platform.runLater(() -> {
+            vboxLogin.setVisible(!vboxLogin.isVisible());
+            vboxRegistration.setVisible(!vboxLogin.isVisible());
+            tfLogin.setText(login);
+            tfPassword.setText(pass);
+            tfRegLogin.clear();
+            tfRegPassword.clear();
+            tfRegNickname.clear();
             lblRegInfo.setText("");
             lblLoginInfo.setText("");
         });
