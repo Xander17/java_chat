@@ -101,6 +101,7 @@ public class Controller implements Initializable {
 
     private void getMessages() throws IOException {
         String inputString;
+        showWelcomeMessage();
         while (true) {
             inputString = inputStream.readUTF();
             taChat.appendText(inputString + "\n");
@@ -180,15 +181,27 @@ public class Controller implements Initializable {
 
     private void sendMsg(String s) {
         s = s.trim();
-        if (!s.isEmpty() & isSocketOpen()) {
+        if (ControlMessage.HELP.check(s)) showHelpMessage();
+        else if (!s.isEmpty() & isSocketOpen()) {
             try {
                 outputStream.writeUTF(s);
             } catch (IOException e) {
                 e.printStackTrace();
             }
-            tfMessage.clear();
-            tfMessage.requestFocus();
         }
+        tfMessage.clear();
+        tfMessage.requestFocus();
+    }
+
+    private void showHelpMessage() {
+        taChat.appendText("Перечень доступных команд:\n");
+        for (ControlMessage msg : ControlMessage.values()) {
+            if (msg.hasDescription()) taChat.appendText(msg.getFullDescription() + "\n");
+        }
+    }
+
+    private void showWelcomeMessage() {
+        taChat.appendText("Добро пожаловать, " + nickname + ". Для получения справки по командам введите /help.\n");
     }
 
     public void clearChat() {
