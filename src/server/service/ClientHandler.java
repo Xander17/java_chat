@@ -75,14 +75,19 @@ public class ClientHandler {
                 mainServer.broadcastMsg(this, inputStr);
                 continue;
             }
-            String[] controlCheck = inputStr.split(" ", 3);
-            if (ControlMessage.CLOSE_CONNECTION.check(controlCheck[0])) break;
-            else if (ControlMessage.WHISPER.check(controlCheck[0]) && controlCheck.length == 3)
-                mainServer.whisper(this, controlCheck[1], controlCheck[2]);
-            else if (ControlMessage.BLACKLIST.check(controlCheck[0]) && controlCheck.length > 1) {
-                sendMsg(blackList.addAndEcho(nickname, controlCheck[1]));
+            String[] controlMsg = inputStr.split(" ", 3);
+            if (ControlMessage.CLOSE_CONNECTION.check(controlMsg[0])) break;
+            else if (ControlMessage.WHISPER.check(controlMsg[0]) && controlMsg.length == 3)
+                mainServer.whisper(this, controlMsg[1], controlMsg[2]);
+            else if (ControlMessage.BLACKLIST.check(controlMsg[0]) && controlMsg.length > 1) {
+                sendMsg(blackList.addAndEcho(nickname, controlMsg[1]));
                 if (blackList.isUpdated())
-                    mainServer.whisperOneWayMessage(nickname, controlCheck[1], "Пользователь добавил вас в черный список");
+                    mainServer.whisperOneWayMessage(nickname, controlMsg[1], "Пользователь добавил вас в черный список");
+            }
+            else if (ControlMessage.BLACKLIST_REMOVE.check(controlMsg[0]) && controlMsg.length > 1) {
+                sendMsg(blackList.removeAndEcho(nickname, controlMsg[1]));
+                if (blackList.isUpdated())
+                    mainServer.whisperOneWayMessage(nickname, controlMsg[1], "Пользователь удалил вас из черного списка");
             }
         }
     }

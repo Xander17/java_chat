@@ -8,7 +8,8 @@ public enum ControlMessage {
     REG("/reg"),
     REG_OK("/regok"),
     WHISPER("/w"),
-    BLACKLIST("/bl");
+    BLACKLIST("/bl"),
+    BLACKLIST_REMOVE("/blremove");
 
     private String message;
 
