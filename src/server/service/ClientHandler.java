@@ -12,6 +12,7 @@ import java.net.Socket;
 public class ClientHandler {
 
     private String nickname = "";
+    private Blacklist blackList;
 
     private MainServer mainServer;
     private Socket socket;
@@ -52,6 +53,7 @@ public class ClientHandler {
                 else if (mainServer.isUserOnline(loginNickname)) sendLoginRegError(LoginRegError.LOGGED_ALREADY);
                 else {
                     nickname = loginNickname;
+                    blackList = new Blacklist(nickname);
                     sendMsg(ControlMessage.AUTH_OK, nickname);
                     break;
                 }
@@ -70,13 +72,18 @@ public class ClientHandler {
         while (true) {
             inputStr = inputStream.readUTF().trim();
             if (!isControlMessage(inputStr)) {
-                mainServer.broadcastMsg(nickname, inputStr);
+                mainServer.broadcastMsg(this, inputStr);
                 continue;
             }
             String[] controlCheck = inputStr.split(" ", 3);
             if (ControlMessage.CLOSE_CONNECTION.check(controlCheck[0])) break;
-            if (ControlMessage.WHISPER.check(controlCheck[0]) && controlCheck.length == 3)
+            else if (ControlMessage.WHISPER.check(controlCheck[0]) && controlCheck.length == 3)
                 mainServer.whisper(this, controlCheck[1], controlCheck[2]);
+            else if (ControlMessage.BLACKLIST.check(controlCheck[0]) && controlCheck.length > 1) {
+                sendMsg(blackList.addAndEcho(nickname, controlCheck[1]));
+                if (blackList.isUpdated())
+                    mainServer.whisperOneWayMessage(nickname, controlCheck[1], "Пользователь добавил вас в черный список");
+            }
         }
     }
 
@@ -122,6 +129,10 @@ public class ClientHandler {
             } catch (IOException ignored) {
             }
         }
+    }
+
+    public boolean checkBlackList(String nick) {
+        return blackList.contains(nick);
     }
 
     public String getNickname() {

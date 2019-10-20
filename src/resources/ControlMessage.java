@@ -7,7 +7,8 @@ public enum ControlMessage {
     ERROR("/error"),
     REG("/reg"),
     REG_OK("/regok"),
-    WHISPER("/w");
+    WHISPER("/w"),
+    BLACKLIST("/bl");
 
     private String message;
 

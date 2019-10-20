@@ -51,7 +51,7 @@ public class MainServer {
                     consoleString = consoleIn.readLine();
                     if (consoleString.trim().isEmpty()) continue;
                     if (consoleString.equalsIgnoreCase(ControlMessage.CLOSE_CONNECTION.toString())) break;
-                    else broadcastMsg("Server",consoleString);
+                    else broadcastMsg(null, consoleString);
                 }
             } catch (IOException e) {
                 e.printStackTrace();
@@ -82,11 +82,14 @@ public class MainServer {
         }
     }
 
-    public void broadcastMsg(String srcNickname, String s) {
+    public void broadcastMsg(ClientHandler srcClient, String msg) {
         if (clients.size() > 0) {
-            s = MessageFormat.broadcast(srcNickname, s);
+            String srcNickname;
+            if (srcClient != null) srcNickname = srcClient.getNickname();
+            else srcNickname = "Server";
+            msg = MessageFormat.broadcast(srcNickname, msg);
             for (ClientHandler client : clients) {
-                client.sendMsg(s);
+                if (srcClient == null || !srcClient.checkBlackList(client.getNickname())) client.sendMsg(msg);
             }
         }
     }
@@ -98,6 +101,14 @@ public class MainServer {
             srcClient.sendMsg(message);
             dstClient.sendMsg(message);
         } else srcClient.sendMsg("User " + dstNickname + " is not online");
+    }
+
+    public void whisperOneWayMessage(String srcNickname, String dstNickname, String message) {
+        ClientHandler dstClient = getClientByNickname(dstNickname);
+        if (dstClient != null) {
+            message = MessageFormat.whisper(srcNickname, dstNickname, message);
+            dstClient.sendMsg(message);
+        }
     }
 
     private void addClient(Socket socket) {

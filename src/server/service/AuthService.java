@@ -4,7 +4,7 @@ import resources.LoginRegError;
 
 import java.sql.*;
 
-public class AuthService {
+class AuthService {
     private static Statement statement = DatabaseSQL.getStatement();
 
     static String getNickByLoginPass(String login, String pass) {
@@ -39,6 +39,17 @@ public class AuthService {
         String query = String.format("select * from clients where %s='%s'", column, entry);
         ResultSet result = statement.executeQuery(query);
         return result.next();
+    }
+
+    static Integer getIdByNick(String nick) {
+        try {
+            ResultSet set = statement.executeQuery(String.format("select id from clients where nickname='%s'", nick));
+            if (set.next())
+                return set.getInt(1);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 
 }
