@@ -4,7 +4,6 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.Set;
 
 public class ChatHistory {
     private static Statement statement = DatabaseSQL.getStatement();
@@ -12,20 +11,17 @@ public class ChatHistory {
 
     public static String get(String nickname) {
         StringBuilder str = new StringBuilder();
-        String query = String.format(
-                "select h.time, c.nickname, h.message from history as h, clients as c on c.id = h.user_id order by time limit (select count(time) from history) - %d, %d",
-                LAST_MESSAGES_TO_SHOW, LAST_MESSAGES_TO_SHOW);
-        // TODO: 21.10.2019 запрос с учетом блеклиста
+        String query = String.format("SELECT h.time, c.nickname, h.message FROM history AS h, clients AS c ON c.id = h.user_id " +
+                "WHERE h.user_id NOT IN (SELECT b.id_user FROM blacklist AS b INNER JOIN clients AS c ON b.id_blacklisted=c.id WHERE c.nickname = '%s' " +
+                "UNION SELECT b.id_blacklisted FROM blacklist AS b INNER JOIN clients AS c ON b.id_user=c.id WHERE c.nickname = '%s') " +
+                "ORDER BY time DESC LIMIT %d", nickname, nickname, LAST_MESSAGES_TO_SHOW);
         try {
-            Set<String> blockedNicknames = Blacklist.getBlacklistSet(nickname);
             ResultSet rs = statement.executeQuery(query);
             while (rs.next()) {
                 String msgNick = rs.getString("nickname");
-                if (blockedNicknames.contains(msgNick)) continue;
                 long msgTime = rs.getLong("time");
                 String msg = rs.getString("message");
-                str.append(MessageFormating.broadcast(msgNick, msgTime, msg));
-                str.append("\n");
+                str.insert(0, MessageFormating.broadcast(msgNick, msgTime, msg) + "\n");
             }
         } catch (SQLException e) {
             e.printStackTrace();
