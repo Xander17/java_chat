@@ -1,9 +1,6 @@
 package server.service;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.SQLException;
-import java.sql.Statement;
+import java.sql.*;
 
 public class DatabaseSQL {
     private static Connection connection;
@@ -34,5 +31,17 @@ public class DatabaseSQL {
 
     public static Statement getStatement() {
         return statement;
+    }
+
+    public static PreparedStatement getPreparedStatement(String query) throws SQLException {
+        return connection.prepareStatement(query);
+    }
+
+    public static void closePreparedStatement(PreparedStatement preparedStatement) {
+        try {
+            if (preparedStatement != null) preparedStatement.close();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
 }

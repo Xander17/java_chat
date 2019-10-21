@@ -31,6 +31,8 @@ public class ClientHandler {
                 inputStream = new DataInputStream(socket.getInputStream());
                 outputStream = new DataOutputStream(socket.getOutputStream());
                 getUserLoginReg();
+                sendChatHistory();
+                sendWelcomeMessage();
                 getMessages();
             } catch (IOException ignored) {
             } finally {
@@ -71,7 +73,7 @@ public class ClientHandler {
         String inputStr;
         while (true) {
             inputStr = inputStream.readUTF().trim();
-            if (!isControlMessage(inputStr)) {
+            if (!ControlMessage.isControlMessage(inputStr)) {
                 mainServer.broadcastMsg(this, inputStr);
                 continue;
             }
@@ -83,17 +85,12 @@ public class ClientHandler {
                 sendMsg(blackList.addAndEcho(nickname, controlMsg[1]));
                 if (blackList.isUpdated())
                     mainServer.whisperOneWayMessage(nickname, controlMsg[1], "Пользователь добавил вас в черный список");
-            }
-            else if (ControlMessage.BLACKLIST_REMOVE.check(controlMsg[0]) && controlMsg.length > 1) {
+            } else if (ControlMessage.BLACKLIST_REMOVE.check(controlMsg[0]) && controlMsg.length > 1) {
                 sendMsg(blackList.removeAndEcho(nickname, controlMsg[1]));
                 if (blackList.isUpdated())
                     mainServer.whisperOneWayMessage(nickname, controlMsg[1], "Пользователь удалил вас из черного списка");
             }
         }
-    }
-
-    private boolean isControlMessage(String s) {
-        return s.startsWith("/");
     }
 
     public void closeIOStreams() {
@@ -136,8 +133,16 @@ public class ClientHandler {
         }
     }
 
+    private void sendChatHistory() {
+        sendMsg(ControlMessage.CHAT_HISTORY, ChatHistory.get(nickname));
+    }
+
+    private void sendWelcomeMessage() {
+        sendMsg("Добро пожаловать, " + nickname + ". Для получения справки по командам введите /help.");
+    }
+
     public boolean checkBlackList(String nick) {
-        return blackList.contains(nick);
+        return blackList.containsNick(nick);
     }
 
     public String getNickname() {

@@ -1,9 +1,7 @@
 package server;
 
 import resources.ControlMessage;
-import server.service.ClientHandler;
-import server.service.DatabaseSQL;
-import server.service.MessageFormat;
+import server.service.*;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -83,13 +81,16 @@ public class MainServer {
     }
 
     public void broadcastMsg(ClientHandler srcClient, String msg) {
+        String srcNickname;
+        long currentTime = System.currentTimeMillis();
+        if (srcClient != null) {
+            srcNickname = srcClient.getNickname();
+            ChatHistory.addMsg(srcNickname, currentTime, msg);
+        } else srcNickname = "Server";
         if (clients.size() > 0) {
-            String srcNickname;
-            if (srcClient != null) srcNickname = srcClient.getNickname();
-            else srcNickname = "Server";
-            msg = MessageFormat.broadcast(srcNickname, msg);
+            msg = MessageFormating.broadcast(srcNickname, currentTime, msg);
             for (ClientHandler client : clients) {
-                if (srcClient == null || !srcClient.checkBlackList(client.getNickname())) client.sendMsg(msg);
+                if (srcClient == null || !Blacklist.isBlacklistRelations(srcClient, client)) client.sendMsg(msg);
             }
         }
     }
@@ -97,7 +98,7 @@ public class MainServer {
     public void whisper(ClientHandler srcClient, String dstNickname, String message) {
         ClientHandler dstClient = getClientByNickname(dstNickname);
         if (dstClient != null) {
-            message = MessageFormat.whisper(srcClient.getNickname(), dstNickname, message);
+            message = MessageFormating.whisper(srcClient.getNickname(), dstNickname, message);
             srcClient.sendMsg(message);
             dstClient.sendMsg(message);
         } else srcClient.sendMsg("User " + dstNickname + " is not online");
@@ -106,7 +107,7 @@ public class MainServer {
     public void whisperOneWayMessage(String srcNickname, String dstNickname, String message) {
         ClientHandler dstClient = getClientByNickname(dstNickname);
         if (dstClient != null) {
-            message = MessageFormat.whisper(srcNickname, dstNickname, message);
+            message = MessageFormating.whisper(srcNickname, dstNickname, message);
             dstClient.sendMsg(message);
         }
     }

@@ -10,7 +10,8 @@ public enum ControlMessage {
     WHISPER("/w", "Отправить личное сообщение (/w [ник] [сообщение])"),
     BLACKLIST("/bl", "Добавить пользователя в черный список (/bl [ник])"),
     BLACKLIST_REMOVE("/blremove", "Удалить пользователя из черного списка (/blremove [ник])"),
-    HELP("/help", "Показать справку по командам");
+    HELP("/help", "Показать справку по командам"),
+    CHAT_HISTORY("/history", "");
 
     private String message;
     private String description;
@@ -34,6 +35,10 @@ public enum ControlMessage {
         else if (message.length() < 9) tabSpaces = "\t\t";
         else tabSpaces = "\t";
         return message + tabSpaces + description;
+    }
+
+    public static boolean isControlMessage(String s) {
+        return s.startsWith("/");
     }
 
     @Override

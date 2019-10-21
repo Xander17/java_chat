@@ -4,8 +4,10 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Set;
 
-class Blacklist {
+public class Blacklist {
 
     private static Statement statement = DatabaseSQL.getStatement();
     private boolean isUpdated = false;
@@ -31,6 +33,28 @@ class Blacklist {
             e.printStackTrace();
         }
         return list;
+    }
+
+    public static boolean isBlacklistRelations(ClientHandler client1, ClientHandler client2) {
+        return client1.checkBlackList(client2.getNickname()) || client2.checkBlackList(client1.getNickname());
+    }
+
+    static Set<String> getBlacklistSet(String nickname) {
+        Set<String> set = new HashSet<>();
+        Integer id = AuthService.getIdByNick(nickname);
+        if (id == null) return set;
+        try {
+            String query = String.format("select c.nickname from blacklist as b inner join clients as c on c.id=b.id_blacklisted where id_user=%d " +
+                    "union " +
+                    "select c.nickname from blacklist as b inner join clients as c on c.id=b.id_user where id_blacklisted=%d", id, id);
+            ResultSet rs = statement.executeQuery(query);
+            while (rs.next()) {
+                set.add(rs.getString(1));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return set;
     }
 
     private static boolean addToDB(Integer userID, Integer blacklistID) {
@@ -63,7 +87,7 @@ class Blacklist {
 
     String addAndEcho(String userNick, String blacklistNick) {
         if (userNick.equals(blacklistNick)) return "Невозможно добавить себя же в черный список";
-        if (contains(blacklistNick)) return "Пользователь " + blacklistNick + " уже есть в черном списке";
+        if (containsNick(blacklistNick)) return "Пользователь " + blacklistNick + " уже есть в черном списке";
         Integer blacklistID = AuthService.getIdByNick(blacklistNick);
         if (blacklistID == null) return "Пользователя " + blacklistNick + " не существует";
         Integer userID = AuthService.getIdByNick(userNick);
@@ -75,7 +99,7 @@ class Blacklist {
     }
 
     String removeAndEcho(String userNick, String blacklistNick) {
-        if (!contains(blacklistNick)) return "Пользователя " + blacklistNick + " нет в черном списке";
+        if (!containsNick(blacklistNick)) return "Пользователя " + blacklistNick + " нет в черном списке";
         Integer blacklistID = AuthService.getIdByNick(blacklistNick);
         Integer userID = AuthService.getIdByNick(userNick);
         if (removeFromDB(userID, blacklistID)) {
@@ -85,7 +109,7 @@ class Blacklist {
         } else return "Ошибка при удалении пользователя из черного списка";
     }
 
-    boolean contains(String nickname) {
+    boolean containsNick(String nickname) {
         return list.contains(nickname);
     }
 }

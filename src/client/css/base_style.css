@@ -98,7 +98,7 @@
     -fx-font-family: "Arial Black";
 }
 
-#taChat {
+#taChat, #listUsers {
     -fx-background-color: -fx-textarea-bg;
     -fx-border-color: -fx-bordercolor;
     -fx-border-width: 2;
@@ -108,7 +108,10 @@
 
 #taChat .scroll-pane,
 #taChat .scroll-pane .viewport,
-#taChat .scroll-pane .content {
+#taChat .scroll-pane .content,
+#listUsers .scroll-pane,
+#listUsers .scroll-pane .viewport,
+#listUsers .scroll-pane .content{
     -fx-background-color: transparent;
 }
 
@@ -125,7 +128,7 @@
     -fx-background-color: -fx-scroll-down;
 }
 
-#taChat .thumb {
+.thumb {
     -fx-background-color: -fx-scroll-thumb;
     -fx-border-color: -fx-bordercolor;
 }

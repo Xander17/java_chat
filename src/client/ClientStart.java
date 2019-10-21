@@ -16,7 +16,7 @@ public class ClientStart extends Application {
 
         Parent root = FXMLLoader.load(getClass().getResource("client.fxml"));
         primaryStage.setTitle("GB Chat");
-        primaryStage.setScene(new Scene(root, 700, 700));
+        primaryStage.setScene(new Scene(root, 800, 700));
         //primaryStage.setMinWidth(300);
         // primaryStage.setMinHeight(300);
         primaryStage.getScene().getStylesheets().add("/client/css/base_style.css");

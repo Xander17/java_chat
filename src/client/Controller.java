@@ -29,6 +29,8 @@ public class Controller implements Initializable {
     @FXML
     private TextArea taChat;
     @FXML
+    private ListView<String> listUsers;
+    @FXML
     private TextField tfMessage, tfLogin, tfRegLogin, tfRegNickname;
     @FXML
     private PasswordField tfPassword, tfRegPassword;
@@ -101,9 +103,14 @@ public class Controller implements Initializable {
 
     private void getMessages() throws IOException {
         String inputString;
-        showWelcomeMessage();
         while (true) {
             inputString = inputStream.readUTF();
+            if (ControlMessage.isControlMessage(inputString)) {
+                String[] controlStr = inputString.split(" ", 2);
+                if (ControlMessage.CHAT_HISTORY.check(controlStr[0])) taChat.insertText(0, controlStr[1]);
+                // TODO: 21.10.2019 сделать скролл вниз сразу после добавления истории
+                continue;
+            }
             taChat.appendText(inputString + "\n");
         }
     }
@@ -200,10 +207,6 @@ public class Controller implements Initializable {
         }
     }
 
-    private void showWelcomeMessage() {
-        taChat.appendText("Добро пожаловать, " + nickname + ". Для получения справки по командам введите /help.\n");
-    }
-
     public void clearChat() {
         taChat.clear();
         tfMessage.requestFocus();
@@ -273,6 +276,7 @@ public class Controller implements Initializable {
             btnSend.setDisable(status);
             tfMessage.setDisable(status);
             taChat.setDisable(status);
+            listUsers.setDisable(status);
             mAbout.setDisable(status);
             mClear.setDisable(status);
             // mSignOut.setDisable(status);
@@ -330,6 +334,7 @@ public class Controller implements Initializable {
     public void signOut() {
         nickname = null;
         taChat.clear();
+        listUsers.getItems().clear();
         setLoginState(true);
     }
 

@@ -16,6 +16,7 @@
 <?import javafx.scene.layout.VBox?>
 
 <?import javafx.scene.control.PasswordField?>
+<?import javafx.scene.control.ListView?>
 <BorderPane fx:id="mainPane" xmlns="http://javafx.com/javafx/8.0.999-ea" xmlns:fx="http://javafx.com/fxml/1"
             fx:controller="client.Controller">
     <top>
@@ -47,7 +48,15 @@
 
     <center>
         <StackPane>
-            <TextArea fx:id="taChat" disable="true" editable="false"/>
+            <BorderPane BorderPane.alignment="center">
+                <right>
+                    <ListView fx:id="listUsers" maxWidth="150" disable="true"/>
+                </right>
+                <center>
+                    <TextArea fx:id="taChat" disable="true" editable="false"/>
+                </center>
+
+            </BorderPane>
             <VBox fx:id="vboxLogin" alignment="CENTER" maxHeight="70.0" maxWidth="250.0" styleClass="dialogWindow">
                 <Label styleClass="lblDialogWindowTitle" text="Sign in" maxWidth="200.0"/>
                 <Label styleClass="lblLoginWindow" text="Login"/>
@@ -55,7 +64,8 @@
                 <Label styleClass="lblLoginWindow" text="Password"/>
                 <PasswordField fx:id="tfPassword" maxWidth="200" onAction="#loginToServer"/>
                 <Label fx:id="lblLoginInfo" styleClass="lblLoginWindow"/>
-                <Button fx:id="btnLogin" maxWidth="150" onAction="#loginToServer" styleClass="btnNotControl" text="Sign in"/>
+                <Button fx:id="btnLogin" maxWidth="150" onAction="#loginToServer" styleClass="btnNotControl"
+                        text="Sign in"/>
                 <Button maxWidth="150" onAction="#swapLoginReg" styleClass="btnNotControl" text="To sign up ->"/>
             </VBox>
             <VBox fx:id="vboxRegistration" alignment="CENTER" maxHeight="70.0" maxWidth="250.0" visible="false"
