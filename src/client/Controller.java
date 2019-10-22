@@ -107,11 +107,11 @@ public class Controller implements Initializable {
             inputString = inputStream.readUTF();
             if (ControlMessage.isControlMessage(inputString)) {
                 String[] controlStr = inputString.split(" ", 2);
-                if (ControlMessage.CHAT_HISTORY.check(controlStr[0])) taChat.insertText(0, controlStr[1]);
-                // TODO: 21.10.2019 сделать скролл вниз сразу после добавления истории
-                continue;
+                if (ControlMessage.CHAT_HISTORY.check(controlStr[0]))
+                        taChat.insertText(0, controlStr[1]);
+                // TODO: 21.10.2019 сделать скролл вниз сразу после добавления истории (временное решение - задержка отправки welcomeMsg
             }
-            taChat.appendText(inputString + "\n");
+            else taChat.appendText(inputString + "\n");
         }
     }
 

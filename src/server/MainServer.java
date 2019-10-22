@@ -90,7 +90,8 @@ public class MainServer {
         if (clients.size() > 0) {
             msg = MessageFormating.broadcast(srcNickname, currentTime, msg);
             for (ClientHandler client : clients) {
-                if (srcClient == null || !Blacklist.isBlacklistRelations(srcClient, client)) client.sendMsg(msg);
+                if (srcClient == null || (!Blacklist.isBlacklistRelations(srcClient, client)&&client.isLogged()))
+                    client.sendMsg(msg);
             }
         }
     }

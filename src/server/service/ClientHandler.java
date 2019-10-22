@@ -13,6 +13,7 @@ public class ClientHandler {
 
     private String nickname = "";
     private Blacklist blackList;
+    private boolean isLogged=false;
 
     private MainServer mainServer;
     private Socket socket;
@@ -57,6 +58,7 @@ public class ClientHandler {
                     nickname = loginNickname;
                     blackList = new Blacklist(nickname);
                     sendMsg(ControlMessage.AUTH_OK, nickname);
+                    isLogged=true;
                     break;
                 }
             } else if (ControlMessage.REG.check(loginPassPair[0])) {
@@ -138,6 +140,12 @@ public class ClientHandler {
     }
 
     private void sendWelcomeMessage() {
+        try {
+            Thread.sleep(50);
+            // TODO: 22.10.2019 временное решение - задержка отправки сообщения, чтобы в клиенте ткно чата проскроллилось вниз
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
         sendMsg("Добро пожаловать, " + nickname + ". Для получения справки по командам введите /help.");
     }
 
@@ -149,4 +157,7 @@ public class ClientHandler {
         return nickname;
     }
 
+    public boolean isLogged() {
+        return isLogged;
+    }
 }
