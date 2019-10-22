@@ -43,7 +43,7 @@
     -fx-padding: 3;
 }
 
-#lblLoginInfo,#lblRegInfo {
+#lblLoginInfo, #lblRegInfo {
     -fx-text-fill: -fx-textcolor-alert;
 }
 
@@ -98,7 +98,7 @@
     -fx-font-family: "Arial Black";
 }
 
-#taChat, #listUsers {
+#taChat {
     -fx-background-color: -fx-textarea-bg;
     -fx-border-color: -fx-bordercolor;
     -fx-border-width: 2;
@@ -108,11 +108,12 @@
 
 #taChat .scroll-pane,
 #taChat .scroll-pane .viewport,
-#taChat .scroll-pane .content,
-#listUsers .scroll-pane,
-#listUsers .scroll-pane .viewport,
-#listUsers .scroll-pane .content{
+#taChat .scroll-pane .content {
     -fx-background-color: transparent;
+}
+
+#listUsers {
+
 }
 
 .scroll-bar {

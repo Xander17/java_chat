@@ -66,7 +66,7 @@ public class Blacklist {
     }
 
     String addAndEcho(String userNick, String blacklistNick) {
-        if (userNick.equals(blacklistNick)) return "Невозможно добавить себя же в черный список";
+        if (userNick.equalsIgnoreCase(blacklistNick)) return "Невозможно добавить себя же в черный список";
         if (containsNick(blacklistNick)) return "Пользователь " + blacklistNick + " уже есть в черном списке";
         Integer blacklistID = AuthService.getIdByNick(blacklistNick);
         if (blacklistID == null) return "Пользователя " + blacklistNick + " не существует";
@@ -90,6 +90,9 @@ public class Blacklist {
     }
 
     boolean containsNick(String nickname) {
-        return list.contains(nickname);
+        for (String blacklisted : list) {
+            if (blacklisted.equalsIgnoreCase(nickname)) return true;
+        }
+        return false;
     }
 }

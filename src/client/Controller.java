@@ -16,6 +16,7 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.Socket;
 import java.net.URL;
+import java.util.Arrays;
 import java.util.ResourceBundle;
 
 
@@ -105,14 +106,32 @@ public class Controller implements Initializable {
         String inputString;
         while (true) {
             inputString = inputStream.readUTF();
-            if (ControlMessage.isControlMessage(inputString)) {
-                String[] controlStr = inputString.split(" ", 2);
-                if (ControlMessage.CHAT_HISTORY.check(controlStr[0]))
-                        taChat.insertText(0, controlStr[1]);
-                // TODO: 21.10.2019 сделать скролл вниз сразу после добавления истории (временное решение - задержка отправки welcomeMsg
+            if (ControlMessage.isControlMessage(inputString)) executeControlMessage(inputString);
+            else {
+                String finalInputString = inputString;
+                Platform.runLater(() -> taChat.appendText(finalInputString + "\n"));
             }
-            else taChat.appendText(inputString + "\n");
         }
+    }
+
+    private void executeControlMessage(String inputString) {
+        String[] controlStr = inputString.split(" ", 2);
+        if (ControlMessage.CHAT_HISTORY.check(controlStr[0]) && controlStr.length > 1)
+            Platform.runLater(() -> taChat.insertText(0, controlStr[1]));
+            // TODO: 21.10.2019 сделать скролл вниз сразу после добавления истории (временное решение - задержка отправки welcomeMsg)
+        else if (ControlMessage.USERLIST.check(controlStr[0]) && controlStr.length > 1) {
+            fillUserList(controlStr[1].split(" "));
+        }
+    }
+
+    private void fillUserList(String[] list) {
+        Platform.runLater(() -> {
+            listUsers.getItems().clear();
+            Arrays.sort(list);
+            for (String nickname : list) {
+                listUsers.getItems().add(nickname);
+            }
+        });
     }
 
     private void setLoginInfo(String s) {

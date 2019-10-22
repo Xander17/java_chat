@@ -59,6 +59,7 @@ public class ClientHandler {
                     blackList = new Blacklist(nickname);
                     sendMsg(ControlMessage.AUTH_OK, nickname);
                     isLogged=true;
+                    mainServer.broadcastUserList();
                     break;
                 }
             } else if (ControlMessage.REG.check(loginPassPair[0])) {

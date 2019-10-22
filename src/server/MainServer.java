@@ -90,7 +90,7 @@ public class MainServer {
         if (clients.size() > 0) {
             msg = MessageFormating.broadcast(srcNickname, currentTime, msg);
             for (ClientHandler client : clients) {
-                if (srcClient == null || (!Blacklist.isBlacklistRelations(srcClient, client)&&client.isLogged()))
+                if (srcClient == null || (!Blacklist.isBlacklistRelations(srcClient, client) && client.isLogged()))
                     client.sendMsg(msg);
             }
         }
@@ -120,11 +120,12 @@ public class MainServer {
     public void deleteClient(ClientHandler client) {
         clients.remove(client);
         System.out.println("Client disconnected. " + getConnectionsCountInfo());
+        broadcastUserList();
     }
 
     private ClientHandler getClientByNickname(String nickname) {
         for (ClientHandler client : clients) {
-            if (client.getNickname().equals(nickname)) return client;
+            if (client.getNickname().equalsIgnoreCase(nickname)) return client;
         }
         return null;
     }
@@ -134,5 +135,15 @@ public class MainServer {
             if (client.getNickname().equals(nickname)) return true;
         }
         return false;
+    }
+
+    public void broadcastUserList() {
+        StringBuilder list = new StringBuilder();
+        for (ClientHandler client : clients) {
+            if (client.isLogged()) list.append(client.getNickname()).append(" ");
+        }
+        for (ClientHandler client : clients) {
+            if (client.isLogged()) client.sendMsg(ControlMessage.USERLIST, list.toString().trim());
+        }
     }
 }

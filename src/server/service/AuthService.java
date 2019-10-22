@@ -8,7 +8,7 @@ class AuthService {
     private static Statement statement = DatabaseSQL.getStatement();
 
     static String getNickByLoginPass(String login, String pass) {
-        String query = String.format("select nickname from clients where login='%s' and password='%s'", login, pass);
+        String query = String.format("select nickname from clients where lower(login) = lower('%s') and password='%s'", login, pass);
         ResultSet result;
         String nickname = null;
         try {
@@ -36,14 +36,14 @@ class AuthService {
     }
 
     private static boolean recordExist(String column, String entry) throws SQLException {
-        String query = String.format("select * from clients where %s='%s'", column, entry);
+        String query = String.format("select * from clients where lower(%s) = lower('%s')", column, entry);
         ResultSet result = statement.executeQuery(query);
         return result.next();
     }
 
     static Integer getIdByNick(String nick) {
         try {
-            ResultSet set = statement.executeQuery(String.format("select id from clients where nickname='%s'", nick));
+            ResultSet set = statement.executeQuery(String.format("select id from clients where lower(nickname) = lower('%s')", nick));
             if (set.next())
                 return set.getInt(1);
         } catch (SQLException e) {
