@@ -11,10 +11,12 @@ public class ChatHistory {
 
     public static String get(String nickname) {
         StringBuilder str = new StringBuilder();
-        String query = String.format("SELECT h.time, c.nickname, h.message FROM history AS h, clients AS c ON c.id = h.user_id " +
-                "WHERE h.user_id NOT IN (SELECT b.id_user FROM blacklist AS b INNER JOIN clients AS c ON b.id_blacklisted=c.id WHERE c.nickname = '%s' " +
-                "UNION SELECT b.id_blacklisted FROM blacklist AS b INNER JOIN clients AS c ON b.id_user=c.id WHERE c.nickname = '%s') " +
-                "ORDER BY time DESC LIMIT %d", nickname, nickname, LAST_MESSAGES_TO_SHOW);
+        String query = String.format("SELECT h.time, c.nickname, h.message FROM history AS h " +
+                    "JOIN clients AS c ON c.id = h.user_id JOIN clients AS c2 ON c2.nickname = '%s' " +
+                    "LEFT JOIN blacklist AS b ON (b.id_blacklisted = h.user_id AND b.id_user = c2.id) " +
+                    "OR (b.id_blacklisted = c2.id AND b.id_user = h.user_id) " +
+                    "WHERE b.id_user IS NULL AND b.id_blacklisted IS NULL " +
+                    "ORDER BY h.time DESC LIMIT %d", nickname, LAST_MESSAGES_TO_SHOW);
         try {
             ResultSet rs = statement.executeQuery(query);
             while (rs.next()) {
