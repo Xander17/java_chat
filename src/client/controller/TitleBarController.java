@@ -71,4 +71,5 @@ public class TitleBarController {
     public void setTitle(String title) {
         Platform.runLater(() -> titleLabel.setText(title));
     }
+
 }

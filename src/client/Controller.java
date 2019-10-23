@@ -1,6 +1,7 @@
 // TODO: 23.10.2019 private message input field
 // TODO: 23.10.2019 Connect menu button
 // TODO: 23.10.2019 SignOut menu button with server realization
+// TODO: 23.10.2019 English|Russian switch with server relization. String resources for translation
 
 package client;
 
@@ -12,6 +13,7 @@ import javafx.scene.control.*;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.VBox;
+import javafx.stage.Stage;
 import resources.ControlMessage;
 import resources.LoginRegError;
 import server.service.FormatChecker;
@@ -334,6 +336,18 @@ public class Controller implements Initializable {
         title += (nickname != null) ? " [Nickname: " + nickname + "]" : "";
         title += (!isSocketOpen()) ? " [No connection]" : " [Connected to " + IP_ADDRESS + ":" + PORT + "]";
         titleBarController.setTitle(title);
+        setWindowTitle();
+    }
+
+    private void setWindowTitle() {
+        Platform.runLater(() -> {
+            try {
+                if (nickname != null)
+                    ((Stage) mainPane.getScene().getWindow()).setTitle("GB Chat - " + nickname);
+                else ((Stage) mainPane.getScene().getWindow()).setTitle("GB Chat");
+            } catch (NullPointerException ignored) {
+            }
+        });
     }
 
     private boolean isSocketOpen() {
