@@ -375,7 +375,7 @@ public class Controller implements Initializable {
         if (mouseEvent.getClickCount() < 2) return;
         Platform.runLater(() -> {
             String nick = listUsers.getSelectionModel().getSelectedItem();
-            if (!nick.equals(nickname)) {
+            if (nick!=null && !nick.equals(nickname)) {
                 listUsers.requestFocus();
                 tfMessage.setText("/w " + nick + " ");
             }
