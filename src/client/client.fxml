@@ -22,27 +22,34 @@
     <top>
         <VBox>
             <fx:include fx:id="titleBar" source="fxml/titleBar.fxml"/>
-            <MenuBar fx:id="menuTop">
-                <Menu text="Chat">
-                    <MenuItem fx:id="mClear" disable="true" onAction="#clearChat" text="Clear window"/>
-                    <!--<MenuItem fx:id="mSignOut" disable="true" onAction="#signOut" text="Sign Out"/>-->
-                    <MenuItem fx:id="mDisconnect" disable="true" onAction="#disconnect" text="Disconnect"/>
-                    <SeparatorMenuItem/>
-                    <MenuItem onAction="#exitChat" text="Close"/>
-                </Menu>
-                <Menu text="Change skin">
-                    <RadioMenuItem onAction="#setStyle" selected="true" text="Light">
-                        <toggleGroup>
-                            <ToggleGroup fx:id="skinsGroup"/>
-                        </toggleGroup>
-                    </RadioMenuItem>
-                    <RadioMenuItem onAction="#setStyle" text="Dark" toggleGroup="$skinsGroup"/>
-                    <RadioMenuItem onAction="#setStyle" text="Lime" toggleGroup="$skinsGroup"/>
-                </Menu>
-                <Menu text="About">
-                    <MenuItem fx:id="mAbout" disable="true" onAction="#aboutWindow" text="About"/>
-                </Menu>
-            </MenuBar>
+            <BorderPane maxHeight="25">
+                <center>
+                    <MenuBar fx:id="menuTop" prefHeight="Infinity">
+                        <Menu text="Chat">
+                            <MenuItem fx:id="mClear" disable="true" onAction="#clearChat" text="Clear window"/>
+                            <!--<MenuItem fx:id="mSignOut" disable="true" onAction="#signOut" text="Sign Out"/>-->
+                            <MenuItem fx:id="mDisconnect" disable="true" onAction="#disconnect" text="Disconnect"/>
+                            <SeparatorMenuItem/>
+                            <MenuItem onAction="#exitChat" text="Close"/>
+                        </Menu>
+                        <Menu text="Change skin">
+                            <RadioMenuItem onAction="#setStyle" selected="true" text="Light">
+                                <toggleGroup>
+                                    <ToggleGroup fx:id="skinsGroup"/>
+                                </toggleGroup>
+                            </RadioMenuItem>
+                            <RadioMenuItem onAction="#setStyle" text="Dark" toggleGroup="$skinsGroup"/>
+                            <RadioMenuItem onAction="#setStyle" text="Lime" toggleGroup="$skinsGroup"/>
+                        </Menu>
+                        <Menu text="About">
+                            <MenuItem fx:id="mAbout" disable="true" onAction="#aboutWindow" text="About"/>
+                        </Menu>
+                    </MenuBar>
+                </center>
+                <right>
+                    <Label fx:id="lblOnline" prefWidth="150" prefHeight="Infinity"/>
+                </right>
+            </BorderPane>
         </VBox>
     </top>
 
@@ -50,10 +57,10 @@
         <StackPane>
             <BorderPane BorderPane.alignment="center">
                 <right>
-                    <ListView fx:id="listUsers" maxWidth="150" disable="true" editable="false" onMouseClicked="#listClick"/>
+                    <ListView fx:id="listUsers" maxWidth="150" disable="true" onMouseClicked="#listClick" visible="false"/>
                 </right>
                 <center>
-                    <TextArea fx:id="taChat" disable="true" editable="false"/>
+                    <TextArea fx:id="taChat" disable="true" editable="false" visible="false"/>
                 </center>
 
             </BorderPane>
@@ -94,10 +101,10 @@
     <bottom>
         <BorderPane BorderPane.alignment="CENTER">
             <right>
-                <Button fx:id="btnSend" disable="true" onAction="#sendMsg" styleClass="btnNotControl" text="Send"/>
+                <Button fx:id="btnSend" disable="true" onAction="#sendMsg" styleClass="btnNotControl" text="Send" visible="false"/>
             </right>
             <center>
-                <TextField fx:id="tfMessage" disable="true" onAction="#sendMsg"/>
+                <TextField fx:id="tfMessage" disable="true" onAction="#sendMsg" visible="false"/>
             </center>
         </BorderPane>
     </bottom>

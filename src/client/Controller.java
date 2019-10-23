@@ -1,3 +1,7 @@
+// TODO: 23.10.2019 private message input field
+// TODO: 23.10.2019 Connect menu button
+// TODO: 23.10.2019 SignOut menu button with server realization
+
 package client;
 
 import client.controller.TitleBarController;
@@ -41,7 +45,7 @@ public class Controller implements Initializable {
     @FXML
     private MenuItem mClear, mAbout, mSignOut, mDisconnect;
     @FXML
-    private Label lblLoginInfo, lblRegInfo;
+    private Label lblLoginInfo, lblRegInfo, lblOnline;
     @FXML
     private BorderPane titleBar;
     @FXML
@@ -132,6 +136,14 @@ public class Controller implements Initializable {
             for (String nickname : list) {
                 listUsers.getItems().add(nickname);
             }
+            lblOnline.setText("Online: " + list.length);
+        });
+    }
+
+    private void clearUserList() {
+        Platform.runLater(() -> {
+            listUsers.getItems().clear();
+            lblOnline.setText("");
         });
     }
 
@@ -281,17 +293,17 @@ public class Controller implements Initializable {
 
 
     public void aboutWindow() {
-        setFieldsDisable(true);
+        setElementsDisable(true);
         vboxAbout.setVisible(true);
     }
 
     public void aboutWindowClose() {
-        setFieldsDisable(false);
+        setElementsDisable(false);
         vboxAbout.setVisible(false);
         tfMessage.requestFocus();
     }
 
-    private void setFieldsDisable(boolean status) {
+    private void setElementsDisable(boolean status) {
         Platform.runLater(() -> {
             btnSend.setDisable(status);
             tfMessage.setDisable(status);
@@ -301,6 +313,13 @@ public class Controller implements Initializable {
             mClear.setDisable(status);
             // mSignOut.setDisable(status);
         });
+    }
+
+    private void setElementsVisible(boolean status) {
+        btnSend.setVisible(status);
+        tfMessage.setVisible(status);
+        taChat.setVisible(status);
+        listUsers.setVisible(status);
     }
 
     public void setStyle() {
@@ -354,12 +373,13 @@ public class Controller implements Initializable {
     public void signOut() {
         nickname = null;
         taChat.clear();
-        listUsers.getItems().clear();
+        clearUserList();
         setLoginState(true);
     }
 
     private void setLoginState(boolean status) {
-        setFieldsDisable(status);
+        setElementsDisable(status);
+        setElementsVisible(!status);
         if (status) lblLoginInfo.setText("");
         vboxLogin.setVisible(status);
         loginState = status;
@@ -375,7 +395,7 @@ public class Controller implements Initializable {
         if (mouseEvent.getClickCount() < 2) return;
         Platform.runLater(() -> {
             String nick = listUsers.getSelectionModel().getSelectedItem();
-            if (nick!=null && !nick.equals(nickname)) {
+            if (nick != null && !nick.equals(nickname)) {
                 listUsers.requestFocus();
                 tfMessage.setText("/w " + nick + " ");
             }

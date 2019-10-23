@@ -1,3 +1,5 @@
+// TODO: 23.10.2019 User online offline notification
+
 package server;
 
 import resources.ControlMessage;
