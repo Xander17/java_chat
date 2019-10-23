@@ -38,4 +38,6 @@
 
     -fx-title-bg-col1: -fx-base-darkcolor;
     -fx-title-bg-col2: -fx-bordercolor;
+
+    -fx-list-bg-hover:-fx-base-lightcolor;
 }
