@@ -98,7 +98,7 @@
     -fx-font-family: "Arial Black";
 }
 
-#taChat {
+#taChat, .list-view {
     -fx-background-color: -fx-textarea-bg;
     -fx-border-color: -fx-bordercolor;
     -fx-border-width: 2;
@@ -112,8 +112,22 @@
     -fx-background-color: transparent;
 }
 
-#listUsers {
+.list-cell {
+    -fx-background-color: transparent;
+    -fx-alignment: center;
+}
 
+.list-cell:filled:hover {
+    -fx-background-color: -fx-list-bg-hover;
+    -fx-background-radius: 5;
+}
+
+.list-cell:hover{
+    -fx-text-fill: -fx-font-over-color;
+}
+
+.list-cell:focused {
+    -fx-background-color: transparent;
 }
 
 .scroll-bar {

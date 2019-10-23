@@ -98,7 +98,8 @@ public class MainServer {
 
     public void whisper(ClientHandler srcClient, String dstNickname, String message) {
         ClientHandler dstClient = getClientByNickname(dstNickname);
-        if (dstClient != null) {
+        if (dstClient==srcClient) srcClient.sendMsg("Вы не можете отправлять личные сообщения себе");
+        else if (dstClient != null) {
             message = MessageFormating.whisper(srcClient.getNickname(), dstNickname, message);
             srcClient.sendMsg(message);
             dstClient.sendMsg(message);

@@ -87,11 +87,11 @@ public class ClientHandler {
             else if (ControlMessage.BLACKLIST.check(controlMsg[0]) && controlMsg.length > 1) {
                 sendMsg(blackList.addAndEcho(nickname, controlMsg[1]));
                 if (blackList.isUpdated())
-                    mainServer.whisperOneWayMessage(nickname, controlMsg[1], "Пользователь добавил вас в черный список");
+                    mainServer.whisperOneWayMessage(nickname, controlMsg[1], "User added you to his blacklist");
             } else if (ControlMessage.BLACKLIST_REMOVE.check(controlMsg[0]) && controlMsg.length > 1) {
                 sendMsg(blackList.removeAndEcho(nickname, controlMsg[1]));
                 if (blackList.isUpdated())
-                    mainServer.whisperOneWayMessage(nickname, controlMsg[1], "Пользователь удалил вас из черного списка");
+                    mainServer.whisperOneWayMessage(nickname, controlMsg[1], "User deleted you from his blacklist");
             }
         }
     }
@@ -142,12 +142,12 @@ public class ClientHandler {
 
     private void sendWelcomeMessage() {
         try {
-            Thread.sleep(50);
+            Thread.sleep(100);
             // TODO: 22.10.2019 временное решение - задержка отправки сообщения, чтобы в клиенте ткно чата проскроллилось вниз
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-        sendMsg("Добро пожаловать, " + nickname + ". Для получения справки по командам введите /help.");
+        sendMsg("Welcome, " + nickname + ". For help enter /help.");
     }
 
     public boolean checkBlackList(String nick) {

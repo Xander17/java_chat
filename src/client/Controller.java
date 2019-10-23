@@ -5,6 +5,7 @@ import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.VBox;
 import resources.ControlMessage;
@@ -368,6 +369,19 @@ public class Controller implements Initializable {
     public void disconnect() {
         closeIOStreams();
         if (!loginState) signOut();
+    }
+
+    public void listClick(MouseEvent mouseEvent) {
+        if (mouseEvent.getClickCount() < 2) return;
+        Platform.runLater(() -> {
+            String nick = listUsers.getSelectionModel().getSelectedItem();
+            if (!nick.equals(nickname)) {
+                listUsers.requestFocus();
+                tfMessage.setText("/w " + nick + " ");
+            }
+            tfMessage.requestFocus();
+            tfMessage.positionCaret(tfMessage.getText().length());
+        });
     }
 }
 

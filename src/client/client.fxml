@@ -50,7 +50,7 @@
         <StackPane>
             <BorderPane BorderPane.alignment="center">
                 <right>
-                    <ListView fx:id="listUsers" maxWidth="150" disable="true"/>
+                    <ListView fx:id="listUsers" maxWidth="150" disable="true" editable="false" onMouseClicked="#listClick"/>
                 </right>
                 <center>
                     <TextArea fx:id="taChat" disable="true" editable="false"/>
