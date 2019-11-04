@@ -4,6 +4,7 @@ import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.image.Image;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 
@@ -21,7 +22,7 @@ public class ClientStart extends Application {
         primaryStage.getScene().getStylesheets().add("css/base_style.css");
         primaryStage.getScene().getStylesheets().add("css/gradient_style.css");
         primaryStage.getScene().getStylesheets().add(DEFAULT_STYLE);
-        //primaryStage.getIcons().add(new Image("client/img/icon.png"));
+        primaryStage.getIcons().add(new Image("img/icon.png"));
         primaryStage.initStyle(StageStyle.UNDECORATED);
         primaryStage.show();
     }
