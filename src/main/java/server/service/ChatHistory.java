@@ -4,6 +4,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.Arrays;
 
 public class ChatHistory {
     private static Statement statement = DatabaseSQL.getStatement();
@@ -26,7 +27,7 @@ public class ChatHistory {
                 str.insert(0, MessageFormating.broadcast(msgNick, msgTime, msg) + "\n");
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            LogService.SERVER.info("ChatHistory",nickname, Arrays.toString(e.getStackTrace()));
         }
         return str.toString();
     }
@@ -43,7 +44,7 @@ public class ChatHistory {
             preparedStatement.setString(3, msg);
             preparedStatement.execute();
         } catch (SQLException | NullPointerException e) {
-            e.printStackTrace();
+            LogService.SERVER.info("ChatHistory",nickname, Arrays.toString(e.getStackTrace()));
         } finally {
             DatabaseSQL.closePreparedStatement(preparedStatement);
         }

@@ -29,13 +29,14 @@ public class MainServer {
             try {
                 DatabaseSQL.connect();
                 server = new ServerSocket(SOCKET_PORT);
-                System.out.println("Server started.");
+                LogService.SERVER.info("Server started.");
                 while (true) {
                     socket = server.accept();
                     addClient(socket);
-                    System.out.println("New client connected. " + getConnectionsCountInfo());
+                    LogService.SERVER.info("New client connected. "+socket+". " + getConnectionsCountInfo());
                 }
-            } catch (IOException ignored) {
+            } catch (IOException e) {
+                LogService.SERVER.error(e.getMessage());
             } finally {
                 serverShutDown();
             }
@@ -54,7 +55,7 @@ public class MainServer {
                     else broadcastMsg(null, consoleString);
                 }
             } catch (IOException e) {
-                e.printStackTrace();
+                LogService.SERVER.error(e.getMessage());
             } finally {
                 serverShutDown();
             }
@@ -75,10 +76,10 @@ public class MainServer {
             DatabaseSQL.shutdown();
             if (!server.isClosed()) {
                 server.close();
-                System.out.println("Server stopped.");
+                LogService.SERVER.info("Server stopped.");
             }
         } catch (IOException e) {
-            e.printStackTrace();
+            LogService.SERVER.error(e.getMessage());
         }
     }
 
@@ -100,7 +101,7 @@ public class MainServer {
 
     public void whisper(ClientHandler srcClient, String dstNickname, String message) {
         ClientHandler dstClient = getClientByNickname(dstNickname);
-        if (dstClient==srcClient) srcClient.sendMsg("Вы не можете отправлять личные сообщения себе");
+        if (dstClient == srcClient) srcClient.sendMsg("Вы не можете отправлять личные сообщения себе");
         else if (dstClient != null) {
             message = MessageFormating.whisper(srcClient.getNickname(), dstNickname, message);
             srcClient.sendMsg(message);
@@ -122,7 +123,7 @@ public class MainServer {
 
     public void deleteClient(ClientHandler client) {
         clients.remove(client);
-        System.out.println("Client disconnected. " + getConnectionsCountInfo());
+        LogService.SERVER.info("Client disconnected. " + getConnectionsCountInfo());
         broadcastUserList();
     }
 

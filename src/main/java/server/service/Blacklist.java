@@ -4,6 +4,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.Arrays;
 
 public class Blacklist {
 
@@ -28,7 +29,7 @@ public class Blacklist {
                 list.add(resultSet.getString(1));
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            LogService.SERVER.error("Blacklist", nick, Arrays.toString(e.getStackTrace()));
         }
         return list;
     }
@@ -42,7 +43,7 @@ public class Blacklist {
             statement.executeUpdate(String.format("insert into blacklist(id_user,id_blacklisted) values(%d,%d)", userID, blacklistID));
             return true;
         } catch (SQLException e) {
-            e.printStackTrace();
+            LogService.SERVER.error("Blacklist", userID.toString(), blacklistID.toString(), Arrays.toString(e.getStackTrace()));
         }
         return false;
     }
@@ -52,7 +53,7 @@ public class Blacklist {
             statement.executeUpdate(String.format("delete from blacklist where id_user='%s' and id_blacklisted='%s'", userID, blacklistID));
             return true;
         } catch (SQLException e) {
-            e.printStackTrace();
+            LogService.SERVER.error("Blacklist", userID.toString(), blacklistID.toString(), Arrays.toString(e.getStackTrace()));
         }
         return false;
     }
@@ -74,6 +75,7 @@ public class Blacklist {
         if (addToDB(userID, blacklistID)) {
             isUpdated = true;
             list.add(blacklistNick);
+            LogService.USERS.info(userNick + " добавил " + blacklistNick + " в черный список");
             return "Вы добавили пользователя " + blacklistNick + " в черный список";
         } else return "Ошибка при добавлении пользователя в черный список";
     }
@@ -85,6 +87,7 @@ public class Blacklist {
         if (removeFromDB(userID, blacklistID)) {
             isUpdated = true;
             list.remove(blacklistNick);
+            LogService.USERS.info(userNick + " удалил " + blacklistNick + " из черного списка");
             return "Вы удалили пользователя " + blacklistNick + " из черного списка";
         } else return "Ошибка при удалении пользователя из черного списка";
     }

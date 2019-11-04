@@ -3,6 +3,7 @@ package server.service;
 import resources.LoginRegError;
 
 import java.sql.*;
+import java.util.Arrays;
 
 class AuthService {
     private static Statement statement = DatabaseSQL.getStatement();
@@ -17,7 +18,7 @@ class AuthService {
                 nickname = result.getString(1);
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            LogService.SERVER.error("AuthService", login, pass, Arrays.toString(e.getStackTrace()));
         }
         return nickname;
     }
@@ -30,7 +31,7 @@ class AuthService {
             if (statement.executeUpdate(query) > 0) return null;
             else return LoginRegError.REG_ERROR;
         } catch (SQLException e) {
-            e.printStackTrace();
+            LogService.SERVER.error("AuthService", login, pass, nickname, Arrays.toString(e.getStackTrace()));
             return LoginRegError.DB_ERROR;
         }
     }
@@ -47,7 +48,7 @@ class AuthService {
             if (set.next())
                 return set.getInt(1);
         } catch (SQLException e) {
-            e.printStackTrace();
+            LogService.SERVER.error("AuthService", nick, Arrays.toString(e.getStackTrace()));
         }
         return null;
     }
