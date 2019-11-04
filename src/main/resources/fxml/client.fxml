@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Menu?>
+<?import javafx.scene.control.MenuBar?>
+<?import javafx.scene.control.MenuItem?>
+<?import javafx.scene.control.RadioMenuItem?>
+<?import javafx.scene.control.SeparatorMenuItem?>
+<?import javafx.scene.control.TextArea?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.ToggleGroup?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+
+<?import javafx.scene.control.PasswordField?>
+<?import javafx.scene.control.ListView?>
+<BorderPane fx:id="mainPane" xmlns="http://javafx.com/javafx/8.0.999-ea" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="client.Controller">
+    <top>
+        <VBox>
+            <fx:include fx:id="titleBar" source="titleBar.fxml"/>
+            <BorderPane maxHeight="25">
+                <center>
+                    <MenuBar fx:id="menuTop" prefHeight="Infinity">
+                        <Menu text="Chat">
+                            <MenuItem fx:id="mClear" disable="true" onAction="#clearChat" text="Clear window"/>
+                            <!--<MenuItem fx:id="mSignOut" disable="true" onAction="#signOut" text="Sign Out"/>-->
+                            <MenuItem fx:id="mDisconnect" disable="true" onAction="#disconnect" text="Disconnect"/>
+                            <SeparatorMenuItem/>
+                            <MenuItem onAction="#exitChat" text="Close"/>
+                        </Menu>
+                        <Menu text="Change skin">
+                            <RadioMenuItem onAction="#setStyle" selected="true" text="Light">
+                                <toggleGroup>
+                                    <ToggleGroup fx:id="skinsGroup"/>
+                                </toggleGroup>
+                            </RadioMenuItem>
+                            <RadioMenuItem onAction="#setStyle" text="Dark" toggleGroup="$skinsGroup"/>
+                            <RadioMenuItem onAction="#setStyle" text="Lime" toggleGroup="$skinsGroup"/>
+                        </Menu>
+                        <Menu text="About">
+                            <MenuItem fx:id="mAbout" disable="true" onAction="#aboutWindow" text="About"/>
+                        </Menu>
+                    </MenuBar>
+                </center>
+                <right>
+                    <Label fx:id="lblOnline" prefWidth="150" prefHeight="Infinity"/>
+                </right>
+            </BorderPane>
+        </VBox>
+    </top>
+
+    <center>
+        <StackPane>
+            <BorderPane BorderPane.alignment="center">
+                <right>
+                    <ListView fx:id="listUsers" maxWidth="150" disable="true" onMouseClicked="#listClick" visible="false"/>
+                </right>
+                <center>
+                    <TextArea fx:id="taChat" disable="true" editable="false" visible="false"/>
+                </center>
+
+            </BorderPane>
+            <VBox fx:id="vboxLogin" alignment="CENTER" maxHeight="70.0" maxWidth="250.0" styleClass="dialogWindow">
+                <Label styleClass="lblDialogWindowTitle" text="Sign in" maxWidth="200.0"/>
+                <Label styleClass="lblLoginWindow" text="Login"/>
+                <TextField fx:id="tfLogin" maxWidth="200" onAction="#passwordFocus"/>
+                <Label styleClass="lblLoginWindow" text="Password"/>
+                <PasswordField fx:id="tfPassword" maxWidth="200" onAction="#loginToServer"/>
+                <Label fx:id="lblLoginInfo" styleClass="lblLoginWindow"/>
+                <Button fx:id="btnLogin" maxWidth="150" onAction="#loginToServer" styleClass="btnNotControl"
+                        text="Sign in"/>
+                <Button maxWidth="150" onAction="#swapLoginReg" styleClass="btnNotControl" text="To sign up ->"/>
+            </VBox>
+            <VBox fx:id="vboxRegistration" alignment="CENTER" maxHeight="70.0" maxWidth="250.0" visible="false"
+                  styleClass="dialogWindow">
+                <Label styleClass="lblDialogWindowTitle" text="Sign up" maxWidth="200.0"/>
+                <Label styleClass="lblLoginWindow" text="Login"/>
+                <TextField fx:id="tfRegLogin" maxWidth="200" onAction="#regPasswordFocus"/>
+                <Label styleClass="lblLoginWindow" text="Password"/>
+                <PasswordField fx:id="tfRegPassword" maxWidth="200" onAction="#regNickFocus"/>
+                <Label styleClass="lblLoginWindow" text="Nickname"/>
+                <TextField fx:id="tfRegNickname" maxWidth="200" onAction="#signUp"/>
+                <Label fx:id="lblRegInfo" styleClass="lblLoginWindow"/>
+                <Button fx:id="btnReg" maxWidth="150" onAction="#signUp" styleClass="btnNotControl" text="Sign up"/>
+                <Button maxWidth="150" onAction="#swapLoginReg" styleClass="btnNotControl" text="To sign in ->"/>
+            </VBox>
+            <VBox fx:id="vboxAbout" alignment="CENTER" maxHeight="70.0" maxWidth="150.0" visible="false"
+                  styleClass="dialogWindow">
+                <Label text="GB Chat"/>
+                <Label text="2019"/>
+                <Label text=" "/>
+                <Button onAction="#aboutWindowClose" styleClass="btnNotControl" text="Close"/>
+            </VBox>
+        </StackPane>
+    </center>
+
+    <bottom>
+        <BorderPane BorderPane.alignment="CENTER">
+            <right>
+                <Button fx:id="btnSend" disable="true" onAction="#sendMsg" styleClass="btnNotControl" text="Send" visible="false"/>
+            </right>
+            <center>
+                <TextField fx:id="tfMessage" disable="true" onAction="#sendMsg" visible="false"/>
+            </center>
+        </BorderPane>
+    </bottom>
+</BorderPane>
