@@ -37,10 +37,7 @@ public class Task2Test {
     @Test
     public void testing() {
         try {
-            Assert.assertArrayEquals(
-                    arrResult, Task2.afterFourArray(arr));
-        } catch (AssertionError e) {
-            Assert.fail(e.getMessage());
+            Assert.assertArrayEquals(arrResult, Task2.afterFourArray(arr));
         } catch (RuntimeException e) {
             System.out.println("Нет четверок");
         }
