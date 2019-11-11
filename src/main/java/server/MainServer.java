@@ -33,7 +33,7 @@ public class MainServer {
                 while (true) {
                     socket = server.accept();
                     addClient(socket);
-                    LogService.SERVER.info("New client connected. "+socket+". " + getConnectionsCountInfo());
+                    LogService.SERVER.info("New client connected. " + socket + ". " + getConnectionsCountInfo());
                 }
             } catch (IOException e) {
                 LogService.SERVER.error(e.getMessage());

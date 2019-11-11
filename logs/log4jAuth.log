@@ -1,6 +1,0 @@
-2019-11-05 00:52:39 INFO   auth:38 - Socket[addr=/127.0.0.1,port=53860,localport=8190]: Попытка авторизации.
-2019-11-05 00:52:39 WARN   auth:44 - Socket[addr=/127.0.0.1,port=53860,localport=8190]: No such login or incorrect password
-2019-11-05 00:52:50 INFO   auth:38 - Socket[addr=/127.0.0.1,port=53860,localport=8190]: Попытка регистрации.
-2019-11-05 00:52:50 WARN   auth:44 - Socket[addr=/127.0.0.1,port=53860,localport=8190]: Login already exists
-2019-11-05 00:52:56 INFO   auth:38 - Socket[addr=/127.0.0.1,port=53860,localport=8190]: Попытка авторизации.
-2019-11-05 00:52:56 INFO   auth:38 - qwerty: Socket[addr=/127.0.0.1,port=53860,localport=8190]: Успешная авторизация.

@@ -12,7 +12,7 @@ public class DatabaseSQL {
 
     public static void connect() {
         try {
-            Class.forName("org.sqlite.JDBC");
+            //Class.forName("org.sqlite.JDBC");
             connection = DriverManager.getConnection("jdbc:sqlite:" + DB_NAME);
             statement = connection.createStatement();
             LogService.SERVER.info("Clients DB connected.");

@@ -1,4 +1,0 @@
-2019-11-05 00:52:24 INFO   server:38 - Clients DB connected.
-2019-11-05 00:52:24 INFO   server:38 - Server started.
-2019-11-05 00:52:28 INFO   server:38 - New client connected. Socket[addr=/127.0.0.1,port=53860,localport=8190]. Total connected clients: 1
-2019-11-05 00:53:24 INFO   server:38 - Client disconnected. Total connected clients: 0
