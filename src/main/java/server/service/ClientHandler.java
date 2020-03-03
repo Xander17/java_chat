@@ -8,12 +8,13 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.Socket;
+import java.util.Arrays;
 
 public class ClientHandler {
 
     private String nickname = "";
     private Blacklist blackList;
-    private boolean isLogged=false;
+    private boolean isLogged = false;
 
     private MainServer mainServer;
     private Socket socket;
@@ -35,8 +36,10 @@ public class ClientHandler {
                 sendChatHistory();
                 sendWelcomeMessage();
                 getMessages();
-            } catch (IOException ignored) {
+            } catch (IOException e) {
+                LogService.SERVER.error(socket.toString(), Arrays.toString(e.getStackTrace()));
             } finally {
+                LogService.SERVER.info("Disconnect", nickname, socket.toString());
                 closeIOStreams();
                 mainServer.deleteClient(this);
             }
@@ -51,6 +54,7 @@ public class ClientHandler {
             loginPassPair = inputStr.split(" ", 3);
             if (loginPassPair.length != 3) continue;
             if (ControlMessage.AUTH.check(loginPassPair[0])) {
+                LogService.AUTH.info(socket.toString(), "Попытка авторизации.");
                 String loginNickname = AuthService.getNickByLoginPass(loginPassPair[1], loginPassPair[2]);
                 if (loginNickname == null) sendLoginRegError(LoginRegError.INCORRECT_LOGIN_PASS);
                 else if (mainServer.isUserOnline(loginNickname)) sendLoginRegError(LoginRegError.LOGGED_ALREADY);
@@ -58,16 +62,20 @@ public class ClientHandler {
                     nickname = loginNickname;
                     blackList = new Blacklist(nickname);
                     sendMsg(ControlMessage.AUTH_OK, nickname);
-                    isLogged=true;
+                    isLogged = true;
                     mainServer.broadcastUserList();
+                    LogService.AUTH.info(nickname, socket.toString(), "Успешная авторизация.");
                     break;
                 }
             } else if (ControlMessage.REG.check(loginPassPair[0])) {
+                LogService.AUTH.info(socket.toString(), "Попытка регистрации.");
                 String login = loginPassPair[1];
                 loginPassPair = loginPassPair[2].split(" ", 2);
                 LoginRegError error = AuthService.registerAndEchoMsg(login, loginPassPair[0], loginPassPair[1]);
-                if (error == null) sendMsg(ControlMessage.REG_OK);
-                else sendLoginRegError(error);
+                if (error == null) {
+                    sendMsg(ControlMessage.REG_OK);
+                    LogService.AUTH.info(login, socket.toString(), "Успешная регистрация.");
+                } else sendLoginRegError(error);
             }
         }
     }
@@ -81,6 +89,8 @@ public class ClientHandler {
                 continue;
             }
             String[] controlMsg = inputStr.split(" ", 3);
+            if (!ControlMessage.WHISPER.check(controlMsg[0]))
+                LogService.USERS.info(nickname, "Control message", inputStr);
             if (ControlMessage.CLOSE_CONNECTION.check(controlMsg[0])) break;
             else if (ControlMessage.WHISPER.check(controlMsg[0]) && controlMsg.length == 3)
                 mainServer.whisper(this, controlMsg[1], controlMsg[2]);
@@ -116,6 +126,7 @@ public class ClientHandler {
     }
 
     private void sendLoginRegError(LoginRegError err) {
+        LogService.AUTH.warn(socket.toString(), err.toString());
         sendMsg(ControlMessage.ERROR.toString() + " " + err.ordinal());
     }
 
@@ -143,7 +154,7 @@ public class ClientHandler {
     private void sendWelcomeMessage() {
         try {
             Thread.sleep(100);
-            // TODO: 22.10.2019 временное решение - задержка отправки сообщения, чтобы в клиенте ткно чата проскроллилось вниз
+            // TODO: 22.10.2019 временное решение - задержка отправки сообщения, чтобы в клиенте окно чата проскроллилось вниз
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
