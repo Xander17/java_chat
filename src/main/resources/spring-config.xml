@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+    <bean name="mainServer" class="server.MainServer">
+        <constructor-arg name="databaseService" ref="databaseService"/>
+        <constructor-arg name="messageFormatting" ref="messageFormatting"/>
+    </bean>
+
+    <bean name="messageFormatting" class="server.service.MessageFormatting"/>
+
+    <bean name="dataSource" class="org.springframework.jdbc.datasource.DriverManagerDataSource">
+        <property name="url" value="jdbc:mysql://localhost:3306/java_chat?serverTimezone=UTC"/>
+        <property name="driverClassName" value="com.mysql.cj.jdbc.Driver"/>
+        <property name="username" value="root"/>
+        <property name="password" value="root"/>
+    </bean>
+
+    <bean name="databaseService" class="server.service.DatabaseService">
+        <constructor-arg name="chatHistory" ref="chatHistory"/>
+        <constructor-arg name="database" ref="databaseSql"/>
+        <constructor-arg name="authService" ref="authService"/>
+        <constructor-arg name="blacklistService" ref="blacklistService"/>
+    </bean>
+
+    <bean name="database" class="server.service.Database">
+        <constructor-arg name="dataSource" ref="dataSource"/>
+    </bean>
+
+    <bean name="authService" class="server.service.AuthService">
+        <constructor-arg name="database" ref="databaseSql"/>
+    </bean>
+
+    <bean name="chatHistory" class="server.service.ChatHistory">
+        <constructor-arg name="database" ref="databaseSql"/>
+        <constructor-arg name="messageFormatting" ref="messageFormatting"/>
+        <constructor-arg name="authService" ref="authService"/>
+    </bean>
+
+    <bean name="blacklistService" class="server.service.BlacklistService">
+        <constructor-arg name="authService" ref="authService"/>
+        <constructor-arg name="database" ref="databaseSql"/>
+    </bean>
+
+</beans>

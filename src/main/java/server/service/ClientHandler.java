@@ -13,17 +13,19 @@ import java.util.Arrays;
 public class ClientHandler {
 
     private String nickname = "";
-    private Blacklist blackList;
+    private ClientBlacklist blackList;
     private boolean isLogged = false;
 
     private MainServer mainServer;
     private Socket socket;
+    private DatabaseService databaseService;
     private DataInputStream inputStream = null;
     private DataOutputStream outputStream = null;
 
-    public ClientHandler(MainServer mainServer, Socket socket) {
+    public ClientHandler(MainServer mainServer, Socket socket, DatabaseService databaseService) {
         this.mainServer = mainServer;
         this.socket = socket;
+        this.databaseService = databaseService;
         startClientThread();
     }
 
@@ -49,18 +51,19 @@ public class ClientHandler {
     private void getUserLoginReg() throws IOException {
         String[] loginPassPair;
         String inputStr;
+        AuthService authService = databaseService.getAuthService();
         while (true) {
             inputStr = inputStream.readUTF();
             loginPassPair = inputStr.split(" ", 3);
             if (loginPassPair.length != 3) continue;
             if (ControlMessage.AUTH.check(loginPassPair[0])) {
                 LogService.AUTH.info(socket.toString(), "Попытка авторизации.");
-                String loginNickname = AuthService.getNickByLoginPass(loginPassPair[1], loginPassPair[2]);
+                String loginNickname = authService.getNickByLoginPass(loginPassPair[1], loginPassPair[2]);
                 if (loginNickname == null) sendLoginRegError(LoginRegError.INCORRECT_LOGIN_PASS);
                 else if (mainServer.isUserOnline(loginNickname)) sendLoginRegError(LoginRegError.LOGGED_ALREADY);
                 else {
                     nickname = loginNickname;
-                    blackList = new Blacklist(nickname);
+                    blackList = new ClientBlacklist(nickname, databaseService);
                     sendMsg(ControlMessage.AUTH_OK, nickname);
                     isLogged = true;
                     mainServer.broadcastUserList();
@@ -71,7 +74,7 @@ public class ClientHandler {
                 LogService.AUTH.info(socket.toString(), "Попытка регистрации.");
                 String login = loginPassPair[1];
                 loginPassPair = loginPassPair[2].split(" ", 2);
-                LoginRegError error = AuthService.registerAndEchoMsg(login, loginPassPair[0], loginPassPair[1]);
+                LoginRegError error = authService.registerAndEchoMsg(login, loginPassPair[0], loginPassPair[1]);
                 if (error == null) {
                     sendMsg(ControlMessage.REG_OK);
                     LogService.AUTH.info(login, socket.toString(), "Успешная регистрация.");
@@ -95,11 +98,11 @@ public class ClientHandler {
             else if (ControlMessage.WHISPER.check(controlMsg[0]) && controlMsg.length == 3)
                 mainServer.whisper(this, controlMsg[1], controlMsg[2]);
             else if (ControlMessage.BLACKLIST.check(controlMsg[0]) && controlMsg.length > 1) {
-                sendMsg(blackList.addAndEcho(nickname, controlMsg[1]));
+                sendMsg(databaseService.getBlacklistService().addAndEcho(blackList, controlMsg[1]));
                 if (blackList.isUpdated())
                     mainServer.whisperOneWayMessage(nickname, controlMsg[1], "User added you to his blacklist");
             } else if (ControlMessage.BLACKLIST_REMOVE.check(controlMsg[0]) && controlMsg.length > 1) {
-                sendMsg(blackList.removeAndEcho(nickname, controlMsg[1]));
+                sendMsg(databaseService.getBlacklistService().removeAndEcho(blackList, controlMsg[1]));
                 if (blackList.isUpdated())
                     mainServer.whisperOneWayMessage(nickname, controlMsg[1], "User deleted you from his blacklist");
             }
@@ -148,7 +151,7 @@ public class ClientHandler {
     }
 
     private void sendChatHistory() {
-        sendMsg(ControlMessage.CHAT_HISTORY, ChatHistory.get(nickname));
+        sendMsg(ControlMessage.CHAT_HISTORY, databaseService.getChatHistory().get(nickname));
     }
 
     private void sendWelcomeMessage() {

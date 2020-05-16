@@ -2,6 +2,7 @@
 
 package server;
 
+import org.springframework.stereotype.Component;
 import resources.ControlMessage;
 import server.service.*;
 
@@ -12,14 +13,24 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.Vector;
 
+@Component
 public class MainServer {
-    private Vector<ClientHandler> clients = new Vector<>();
-    private ServerSocket server = null;
-    private Socket socket = null;
+    private Vector<ClientHandler> clients;
+    private ServerSocket server;
+    private Socket socket;
 
     private final int SOCKET_PORT = 8190;
 
-    MainServer() {
+    private MessageFormatting messageFormatting;
+    private DatabaseService databaseService;
+
+    public MainServer(DatabaseService databaseService, MessageFormatting messageFormatting) {
+        this.databaseService = databaseService;
+        this.messageFormatting = messageFormatting;
+    }
+
+    public void run() {
+        clients = new Vector<>();
         runServer();
         runConsoleHandler();
     }
@@ -27,7 +38,6 @@ public class MainServer {
     private void runServer() {
         new Thread(() -> {
             try {
-                DatabaseSQL.connect();
                 server = new ServerSocket(SOCKET_PORT);
                 LogService.SERVER.info("Server started.");
                 while (true) {
@@ -73,7 +83,7 @@ public class MainServer {
 
         try {
             clients.forEach(ClientHandler::closeIOStreams);
-            DatabaseSQL.shutdown();
+            databaseService.getDatabase().shutdown();
             if (!server.isClosed()) {
                 server.close();
                 LogService.SERVER.info("Server stopped.");
@@ -88,12 +98,12 @@ public class MainServer {
         long currentTime = System.currentTimeMillis();
         if (srcClient != null) {
             srcNickname = srcClient.getNickname();
-            ChatHistory.addMsg(srcNickname, currentTime, msg);
+            databaseService.getChatHistory().addMsg(srcNickname, currentTime, msg);
         } else srcNickname = "Server";
         if (clients.size() > 0) {
-            msg = MessageFormating.broadcast(srcNickname, currentTime, msg);
+            msg = messageFormatting.broadcast(srcNickname, currentTime, msg);
             for (ClientHandler client : clients) {
-                if (srcClient == null || (!Blacklist.isBlacklistRelations(srcClient, client) && client.isLogged()))
+                if (srcClient == null || (!databaseService.getBlacklistService().isBlacklistRelations(srcClient, client) && client.isLogged()))
                     client.sendMsg(msg);
             }
         }
@@ -103,7 +113,7 @@ public class MainServer {
         ClientHandler dstClient = getClientByNickname(dstNickname);
         if (dstClient == srcClient) srcClient.sendMsg("Вы не можете отправлять личные сообщения себе");
         else if (dstClient != null) {
-            message = MessageFormating.whisper(srcClient.getNickname(), dstNickname, message);
+            message = messageFormatting.whisper(srcClient.getNickname(), dstNickname, message);
             srcClient.sendMsg(message);
             dstClient.sendMsg(message);
         } else srcClient.sendMsg("User " + dstNickname + " is not online");
@@ -112,13 +122,13 @@ public class MainServer {
     public void whisperOneWayMessage(String srcNickname, String dstNickname, String message) {
         ClientHandler dstClient = getClientByNickname(dstNickname);
         if (dstClient != null) {
-            message = MessageFormating.whisper(srcNickname, dstNickname, message);
+            message = messageFormatting.whisper(srcNickname, dstNickname, message);
             dstClient.sendMsg(message);
         }
     }
 
     private void addClient(Socket socket) {
-        clients.add(new ClientHandler(this, socket));
+        clients.add(new ClientHandler(this, socket, databaseService));
     }
 
     public void deleteClient(ClientHandler client) {
