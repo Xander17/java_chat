@@ -16,7 +16,7 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import resources.ControlMessage;
 import resources.LoginRegError;
-import server.service.FormatChecker;
+import resources.FormatChecker;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;

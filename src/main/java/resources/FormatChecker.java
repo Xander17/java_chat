@@ -1,4 +1,4 @@
-package server.service;
+package resources;
 
 import resources.LoginRegError;
 
